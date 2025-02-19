@@ -65,15 +65,15 @@ def register(request):
 def profile_setup(request):
     #fetch User data and accesing profile
     current_user = request.user
-    profile = ProfileSetup.objects(user=current_user)
+    profile = ProfileSetup.objects.filter(user=current_user).first()
     if request.method == "POST":
         #fetch input data
-        first_name = request.POST("first_name")
-        last_name = request.POST("last_name")
-        date_birth = request.POST("date_of_birth")
-        location = request.POST("location")
-        email = request.POST("email")
-        bio = request.POST("bio")
+        first_name = request.POST["first_name"]
+        last_name = request.POST["last_name"]
+        date_birth = request.POST["date_of_birth"]
+        location = request.POST["location"]
+        email = request.POST["email"]
+        bio = request.POST["bio"]
         profile_picture = request.FILES.get("profile_picture")
 
         #saving data in user model
@@ -82,12 +82,24 @@ def profile_setup(request):
 
         if current_user.email is not email:
             current_user.email = email
-        
+        current_user.save()
         #saving data in profile_setup model
-        profile.birth_date = date_birth
-        profile.location = location
-        profile.bio = bio
-        profile.proile_picture = profile_picture
+         # Saving data in profile_setup model
+        if profile:
+            profile.birth_date = date_birth
+            profile.location = location
+            profile.bio = bio
+            profile.profile_picture = profile_picture
+            profile.save()  # Don't forget to save the profile!
+        else:
+            # Handle case if profile does not exist (create a new profile if necessary)
+            profile = ProfileSetup.objects.create(
+                user=current_user,
+                birth_date=date_birth,
+                location=location,
+                bio=bio,
+                profile_picture=profile_picture
+            )
 
         return HttpResponseRedirect(reverse("index"))
 
