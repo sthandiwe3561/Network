@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import User, ProfileSetup
 
 
 def index(request):
@@ -63,4 +63,8 @@ def register(request):
         return render(request, "network/register.html")
 
 def profile_setup(request):
-    return render("network/profile_setup.html")
+    #fetch User data
+    current_user = request.user
+    return render("network/profile_setup.html", {
+        "user":current_user
+    })
