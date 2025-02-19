@@ -1,4 +1,4 @@
-{% extends "network/layout.html"} {% block body %}
+{% extends "network/layout.html" %} {% block body %}
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}
 
@@ -11,8 +11,17 @@
   <label>Email:</label>
   <input type="email" name="email" value="{{ user.email }}" /><br />
 
+  <label>Date of Birth:</label>
+  <input type="file" name="date_of_birth" /><br />
+
+  <label>Location:</label>
+  <input type="file" name="location" /><br />
+
   <label>Profile Picture:</label>
   <input type="file" name="profile_picture" /><br />
+
+  <label>Bio</label>
+  <textarea type="text" name="bio"></textarea>
 
   <button type="submit">Save Changes</button>
 </form>
