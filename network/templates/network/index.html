@@ -1,5 +1,21 @@
-{% extends "network/layout.html" %}
+{% extends "network/layout.html" %} {% block body %}
+<a href="#" class="link">Create a Post</a>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
 
-{% block body %}
-    TODO
-{% endblock %}
+  <div class="form-group">
+    <textarea
+      name="content"
+      class="form-control"
+      placeholder="What's on your mind?"
+      rows="3"
+    ></textarea>
+  </div>
+  <div class="form-group mt-2">
+    <label for="image">Upload an image (optional):</label>
+    <input type="file" name="image" class="form-control-file" />
+  </div>
+
+  <button type="submit">Post</button>
+</form>
+TODO {% endblock %}
