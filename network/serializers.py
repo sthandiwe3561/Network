@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Post,User
 
-
+#user serializer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
