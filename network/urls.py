@@ -12,10 +12,10 @@ urlpatterns = [
     path("profile_setup", views.profile_setup, name="profile_setup"),
 
     #api path
-    path("users/getuser/",views.getuser, name="getuser"),
-    path("users/createuser/", views.createuser,name="createuser"),
-    path("users/userdetails/<int:pk>", views.userdetails, name="userdetails"),
-    path("createpost", views.createpost, name="createpost"),
+    path("users",views.getuser, name="getuser"),
+    path("users", views.createuser,name="createuser"),
+    path("users/<int:pk>", views.userdetails, name="userdetails"),
+    path("post", views.createpost, name="createpost"),
 ]
 
 # Serve media files in development mode
