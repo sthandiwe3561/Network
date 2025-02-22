@@ -3,8 +3,13 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-
+from .serializers import UserSerializer, PostSerializer
 from .models import User, ProfileSetup
+#import from rest_framework
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 
 def index(request):
@@ -106,3 +111,71 @@ def profile_setup(request):
     return render(request,"network/profile_setup.html", {
         "user":current_user
     })
+
+#This is for user model
+#get user
+@api_view(['GET'])
+def getuser(request):
+    #get data fromthe model and display it
+    user = User.objects.all()
+
+    #serialize the data 
+    serializer = UserSerializer(user,many=True)
+    #returning the data that has been serialized
+    return Response(serializer.data)
+
+
+
+#create users
+@api_view(['POST'])
+def createuser(request):
+    # GET the data from the input and serailize and save i
+    serializer = UserSerializer(data = request.data)
+
+    #check if the data we got above is valid and save it
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status = status.HTTP_201_CREATED)
+    return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
+
+#get a specific user delete the user or put(update) the user
+
+@api_view(['GET','PUT','DELETE'])
+def userdetails(request,pk):
+    #fecth the users data by the id passed 
+    try:
+        user = User.objects.get(pk=pk)
+    except user.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    #covering the get method for that particuler user
+    if request.method == 'GET':
+        #serializing the user requested data
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+    
+    #updating the certain users data 
+    if request.method == 'PUT':
+        #GET THE DATA THAT TO UPDATE WITH
+        serializer = UserSerializer(user,data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(status = status.HTTP_400_BAD_REQUEST)
+    #deleting the data for that requested user
+    if request.method == 'DELETE':
+        user.delete()
+    return Response(status = status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def createpost(request):
+    serializer = PostSerializer(data = request.data)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status = status.HTTP_201_CREATED)
+    return Response(status = status.HTTP_400_BAD_REQUEST)
+
+
+
