@@ -7,7 +7,7 @@ class User(AbstractUser):
 
 class ProfileSetup(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    profile_picture = models.ImageField(upload_to="profile_pics/", default="default.jpg")
+    profile_picture = models.ImageField(upload_to="profile_setup/", default="default.jpg")
     bio = models.TextField(blank=True)
     location = models.CharField(max_length=100,blank=True)
     birth_date = models.DateField(null=True, blank=True)
@@ -19,7 +19,7 @@ class ProfileSetup(models.Model):
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="post")
     content = models.TextField()
-    image = models.ImageField(upload_to="post_images/", blank=True, null=True)  # Optional field
+    image = models.ImageField(upload_to="posts/", blank=True, null=True, default="default.jpg")  # Optional field
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

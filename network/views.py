@@ -4,12 +4,14 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from .serializers import UserSerializer, PostSerializer
-from .models import User, ProfileSetup
+from .models import User, ProfileSetup,Post
 #import from rest_framework
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny,IsAuthenticatedOrReadOnly
+from rest_framework import viewsets
+
 
 
 def index(request):
@@ -112,70 +114,39 @@ def profile_setup(request):
         "user":current_user
     })
 
-#This is for user model
-#get user
-@api_view(['GET'])
-def getuser(request):
-    #get data fromthe model and display it
-    user = User.objects.all()
 
-    #serialize the data 
-    serializer = UserSerializer(user,many=True)
-    #returning the data that has been serialized
+@api_view(['POST'])
+def PostView(request):
+    if not request.user.is_authenticated:
+        return Response({"error": "User not authenticated"}, status=status.HTTP_403_FORBIDDEN)
+
+    # Add the logged-in user to the request data
+    data = request.data.copy()  # Make a mutable copy
+    data["user"] = request.user.id  # Assign user ID
+
+    serializer = PostSerializer(data=data)
+   
+     #check if the data we got above is valid and save it
+    if serializer.is_valid():
+        serializer.save(user=request.user)
+        return Response(serializer.data, status =status.HTTP_201_CREATED)
+    return Response(status= status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def getpost(request):
+    post = Post.objects.all()
+    serializer = PostSerializer(post, many=True)
+
     return Response(serializer.data)
 
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [AllowAny]
+
+    def perform_create(self, serializer):
+        """Assigns the authenticated user to the post before saving."""
+        serializer.save(user=self.request.user)
 
 
-#create users
-@api_view(['POST'])
-def createuser(request):
-    # GET the data from the input and serailize and save i
-    serializer = UserSerializer(data = request.data)
-
-    #check if the data we got above is valid and save it
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status = status.HTTP_201_CREATED)
-    return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
-
-#get a specific user delete the user or put(update) the user
-
-@api_view(['GET','PUT','DELETE'])
-def userdetails(request,pk):
-    #fecth the users data by the id passed 
-    try:
-        user = User.objects.get(pk=pk)
-    except user.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    #covering the get method for that particuler user
-    if request.method == 'GET':
-        #serializing the user requested data
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
-    
-    #updating the certain users data 
-    if request.method == 'PUT':
-        #GET THE DATA THAT TO UPDATE WITH
-        serializer = UserSerializer(user,data = request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(status = status.HTTP_400_BAD_REQUEST)
-    #deleting the data for that requested user
-    if request.method == 'DELETE':
-        user.delete()
-    return Response(status = status.HTTP_204_NO_CONTENT)
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def createpost(request):
-    serializer = PostSerializer(data = request.data)
-
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status = status.HTTP_201_CREATED)
-    return Response(status = status.HTTP_400_BAD_REQUEST)
-
-
-
+        
