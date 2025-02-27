@@ -21,6 +21,7 @@ class Post(models.Model):
     content = models.TextField()
     image = models.ImageField(upload_to="posts/", blank=True, null=True, default="default.jpg")  # Optional field
     created_at = models.DateTimeField(auto_now_add=True)
+    hide = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Post by {self.user.username} - {self.created_at.strftime('%Y-%m-%d')}"
