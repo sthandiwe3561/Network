@@ -25,20 +25,10 @@
         <ul class="navbar-nav mr-auto">
           {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link" href="#" id="profile"
-              >{{user.username}}<img
-                src="{{ user.profilesetup.profile_picture.url }}"
-                alt="Profile Picture"
-                class="profile_img"
-            /></a>
+            <a class="nav-link" href="#" id="profile">{{user.username}}</a>
           </li>
           {% endif %}
           <li class="nav-item">
-            <img
-              src="{{ user.profilesetup.profile_picture.url }}"
-              alt="Profile Picture"
-              class="profile_img"
-            />
             <a class="nav-link" href="{% url 'index' %}">All Posts</a>
           </li>
           {% if user.is_authenticated %}
@@ -48,8 +38,17 @@
           <li class="nav-item">
             <a href="#" class="nav-link" id="post">Create a Post</a>
           </li>
+
           <li class="nav-item">
             <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="profile"
+              ><img
+                src="{{ user.profile.profile_picture.url }}"
+                alt="Profile Picture"
+                class="profile_img"
+            /></a>
           </li>
           {% else %}
           <li class="nav-item">

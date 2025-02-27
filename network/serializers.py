@@ -13,7 +13,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id','first_name','last_name','username','profile')
-        exclude = ["password"]
 
 #api/serializer for post
 class PostSerializer(serializers.ModelSerializer):

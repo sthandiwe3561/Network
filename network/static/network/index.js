@@ -79,18 +79,32 @@ function allpost() {
         console.log(post);
         //create a div for each post
         const postDiv = document.createElement("div");
-        postDiv.setAttribute("style", "border: 1px solid black:");
-        // Set the image source
-        const imageUrl = post.image ? post.image : "default-profile.png"; // Fallback image
+
+        // Access profile picture correctly
+        const profileImageUrl =
+          post.user.profile?.profile_picture || "/media/default.jpg";
+
+        const imageUrl = post.image ? post.image : `/media/default.jpg`;
 
         //posts layout
-        postDiv.innerHTML = `<div><img
-                src=""
+        postDiv.innerHTML = `
+              <div class="post-container">
+               <div class="post-header">
+               <div class="user-info">
+               <img
+                src="${profileImageUrl}"
                 alt="Profile Picture"
                 class="profile_img">
+                <span class="user-name">${post.user.first_name} ${post.user.last_name}</span>
                 </div>
-                <span>${post.user.first_name}</span>
-                <span>${post.user.last_name}</span>`;
+                <button class="follow-btn">Follow</button>
+                </div>
+                <div class="post-content">${post.content}</div>
+                <div class="post-image"><img src="${imageUrl}" alt="Post Image"></div>
+                <div class="post-action"><button class="like-btn">like</button>
+                 <span class="comment"><a href="#">comments</a></span>
+                 </div>
+                 </div>`;
 
         //append it on my html div forallpost
         document.getElementById("allpost").appendChild(postDiv);
