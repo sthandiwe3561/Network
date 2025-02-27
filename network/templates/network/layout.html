@@ -26,7 +26,7 @@
           {% if user.is_authenticated %}
           <li class="nav-item">
             <a class="nav-link" href="#" id="profile"
-              ><img
+              >{{user.username}}<img
                 src="{{ user.profilesetup.profile_picture.url }}"
                 alt="Profile Picture"
                 class="profile_img"
@@ -34,6 +34,11 @@
           </li>
           {% endif %}
           <li class="nav-item">
+            <img
+              src="{{ user.profilesetup.profile_picture.url }}"
+              alt="Profile Picture"
+              class="profile_img"
+            />
             <a class="nav-link" href="{% url 'index' %}">All Posts</a>
           </li>
           {% if user.is_authenticated %}

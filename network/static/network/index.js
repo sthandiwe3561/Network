@@ -69,4 +69,34 @@ function allpost() {
   document.querySelector("#allpost").style.display = "block";
   document.querySelector("#profile").style.display = "none";
   document.querySelector("#notifications").style.display = "none";
+
+  //fecth and display post
+  fetch("/post/")
+    .then((response) => response.json())
+    .then((eachpost) => {
+      //foreach post
+      eachpost.forEach((post) => {
+        console.log(post);
+        //create a div for each post
+        const postDiv = document.createElement("div");
+        postDiv.setAttribute("style", "border: 1px solid black:");
+        // Set the image source
+        const imageUrl = post.image ? post.image : "default-profile.png"; // Fallback image
+
+        //posts layout
+        postDiv.innerHTML = `<div><img
+                src=""
+                alt="Profile Picture"
+                class="profile_img">
+                </div>
+                <span>${post.user.first_name}</span>
+                <span>${post.user.last_name}</span>`;
+
+        //append it on my html div forallpost
+        document.getElementById("allpost").appendChild(postDiv);
+      });
+    })
+    .catch((error) => {
+      console.error("Error fetching posts:", error);
+    });
 }
