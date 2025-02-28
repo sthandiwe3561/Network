@@ -115,30 +115,6 @@ def profile_setup(request):
     })
 
 
-@api_view(['POST'])
-def PostView(request):
-    if not request.user.is_authenticated:
-        return Response({"error": "User not authenticated"}, status=status.HTTP_403_FORBIDDEN)
-
-    # Add the logged-in user to the request data
-    data = request.data.copy()  # Make a mutable copy
-    data["user"] = request.user.id  # Assign user ID
-
-    serializer = PostSerializer(data=data)
-   
-     #check if the data we got above is valid and save it
-    if serializer.is_valid():
-        serializer.save(user=request.user)
-        return Response(serializer.data, status =status.HTTP_201_CREATED)
-    return Response(status= status.HTTP_400_BAD_REQUEST)
-
-@api_view(['GET'])
-def getpost(request):
-    post = Post.objects.all()
-    serializer = PostSerializer(post, many=True)
-
-    return Response(serializer.data)
-
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
@@ -147,6 +123,21 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Assigns the authenticated user to the post before saving."""
         serializer.save(user=self.request.user)
+    
+    #it is to update some fields because viewset class when you use PUT it expect you to update all the  fields so this 
+    #is to add an extra condition so the class will be able to also PUT some fileds not only all of them
+    def update(self, request, *args, **kwargs):
+        """Allow partial updates, specifically for hiding posts."""
+        instance = self.get_object()
+        data = request.data  # Get request data
+        
+        # Ensure 'hide' key is present in request
+        if "hide" in data:
+            instance.hide = data["hide"]
+            instance.save()
+            return Response({"message": "Post updated successfully"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Invalid data"}, status=status.HTTP_400_BAD_REQUEST)
 
 
         

@@ -63,6 +63,40 @@ function getCSRFToken() {
   return document.querySelector("[name=csrfmiddlewaretoken]").value;
 }
 
+function hide(postid, isHide) {
+  // this fetch is for updating
+  fetch(`/post/${postid}/`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": getCSRFToken(), // Ensure CSRF token is included
+    },
+    body: JSON.stringify({
+      hide: isHide,
+    }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(() => {
+      console.log(`Post ${postid} is now ${isHide ? "hidden" : "visible"}`);
+      allpost(); // Refresh posts
+    })
+    .catch((error) => {
+      console.error("Error updating post:", error);
+    });
+}
+
+function getCSRFToken() {
+  return document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("csrftoken="))
+    ?.split("=")[1];
+}
+
 function allpost() {
   //show cratepost and hide other views
   document.querySelector("#createpost").style.display = "none";
@@ -98,13 +132,39 @@ function allpost() {
                 <span class="user-name">${post.user.first_name} ${post.user.last_name}</span>
                 </div>
                 <button class="follow-btn">Follow</button>
-                </div>
+                    <div class="post-options">
+                <button class="options-btn">⋮</button>
+                <div class="dropdown-menu">
+                 <ul>
+                    <li><a href="#">Edit</a></li>
+                   <li><a href="#">Delete</a></li>
+                   <li><a href="#" onclick="hide(${post.id},true)">Hide</a></li>
+                 </ul>
+               </div>
+              </div>
+              </div>
                 <div class="post-content">${post.content}</div>
                 <div class="post-image"><img src="${imageUrl}" alt="Post Image"></div>
                 <div class="post-action"><button class="like-btn">like</button>
                  <span class="comment"><a href="#">comments</a></span>
-                 </div>
                  </div>`;
+
+        //dropdown
+        postDiv
+          .querySelector(".options-btn")
+          .addEventListener("click", (event) => {
+            event.stopPropagation(); // Prevents the click from bubbling up
+            let dropdown = postDiv.querySelector(".dropdown-menu");
+            dropdown.style.display =
+              dropdown.style.display === "block" ? "none" : "block";
+          });
+
+        // Close the dropdown when clicking anywhere else
+        document.addEventListener("click", () => {
+          document.querySelectorAll(".dropdown-menu").forEach((menu) => {
+            menu.style.display = "none";
+          });
+        });
 
         //append it on my html div forallpost
         document.getElementById("allpost").appendChild(postDiv);

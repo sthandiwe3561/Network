@@ -1,25 +1,9 @@
-/*.post-header {
-  display: flex;
-  align-items: center; /* Align items in the center vertically 
-  gap: 10px; /* Add spacing between image and name 
-}*/
-/*
-.profile_img {
-  width: 40px; /* Set the width
-  height: 40px; /* Set the height 
-  border-radius: 50%; /* Make it round 
-  object-fit: cover; /* Ensure the image covers the entire area 
-}
-
-.post-user-name {
-  font-size: 16px; /* Adjust font size 
-  font-weight: bold; /* Make the name bold 
-}*/
+/*post*/
 .post-container {
   border: 1px solid #ddd;
   border-radius: 10px;
   padding: 20px;
-  margin: 20px 130px;
+  margin: 20px 170px;
   background: #fff;
   box-shadow: 2px 6px 8px rgba(0, 0, 0, 0.1);
 }
@@ -28,6 +12,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
   margin-bottom: 10px;
 }
 
@@ -50,6 +35,7 @@
 }
 
 .follow-btn {
+  margin-left: 70%;
   background: #007bff;
   color: white;
   border: none;
@@ -100,4 +86,54 @@
 
 .comments a:hover {
   text-decoration: underline;
+}
+
+.post-options {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between Follow button and ⋮ dropdown */
+}
+/*
+.post-options {
+  position: relative;
+  display: inline-block;
+}*/
+
+.options-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  min-width: 100px;
+  border-radius: 5px;
+  z-index: 10;
+}
+
+.dropdown-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 5px;
+}
+
+.dropdown-menu li {
+  padding: 8px;
+}
+
+.dropdown-menu li a {
+  text-decoration: none;
+  color: black;
+  display: block;
+}
+
+.dropdown-menu li:hover {
+  background: #f5f5f5;
 }
