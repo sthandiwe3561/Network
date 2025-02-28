@@ -10,12 +10,49 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelector("#post").addEventListener("click", () => createpost());
 });
 
-function createpost() {
+function getCSRFToken() {
+  return (
+    document.querySelector("[name=csrfmiddlewaretoken]").value ||
+    document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("csrftoken="))
+      ?.split("=")[1]
+  );
+}
+
+let editingPostId = null; // This will store the post ID when editing a post
+
+function createpost(postId = null) {
   //show cratepost and hide other views
   document.querySelector("#createpost").style.display = "block";
   document.querySelector("#allpost").style.display = "none";
   document.querySelector("#profile").style.display = "none";
   document.querySelector("#notifications").style.display = "none";
+
+  if (postId) {
+    // If editing a post, set the editingPostId to the postId
+    editingPostId = postId;
+
+    // Fetch the post data to populate the form
+    fetch(`/post/${postId}/`)
+      .then((response) => response.json())
+      .then((post) => {
+        // Fill the form with the post data
+        document.querySelector("#texterea").value = post.content;
+        // For the image, you can add a preview (optional)
+        document.querySelector("#image").value = ""; // Reset the file input
+        // You can show the existing image if needed, or use a preview
+        console.log(post); // For debugging
+      })
+      .catch((error) => {
+        console.error("Error fetching post:", error);
+      });
+  } else {
+    // Reset the form if creating a new post
+    document.querySelector("#texterea").value = "";
+    document.querySelector("#image").value = ""; // Reset the file input
+    editingPostId = null; // Reset the editing post ID
+  }
 }
 
 function handlesubmit(event) {
@@ -37,9 +74,13 @@ function handlesubmit(event) {
     console.log("No file selected");
   }
 
-  fetch("/post/", {
+  // If editing a post, use PUT, otherwise use POST
+  const method = editingPostId ? "PUT" : "POST"; // PUT for editing, POST for creating
+  const url = editingPostId ? `/post/${editingPostId}/` : "/post/";
+
+  fetch(url, {
     // ✅ Ensure the correct endpoint with a trailing slash
-    method: "POST",
+    method: method,
     headers: { "X-CSRFToken": getCSRFToken() }, // CSRF token required
     body: formData, // ✅ Don't set Content-Type manually, it's handled by FormData
   })
@@ -53,14 +94,24 @@ function handlesubmit(event) {
       console.log(result);
       console.log("helloit working");
       allpost(); // ✅ Ensure `allpost()` is defined and working
+      editingPostId = null; // Reset editingPostId after successful submission
     })
     .catch((error) => {
       console.error("Error while creating post:", error);
     });
 }
 
-function getCSRFToken() {
-  return document.querySelector("[name=csrfmiddlewaretoken]").value;
+function Delete(postId) {
+  fetch(`/post/${postId}/`, {
+    method: "DELETE",
+    headers: { "X-CSRFToken": getCSRFToken() },
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error("Failed to delete post");
+      console.log("Post deleted successfully");
+      allpost(); // Refresh post list
+    })
+    .catch((error) => console.error("Error:", error));
 }
 
 function hide(postid, isHide) {
@@ -88,13 +139,6 @@ function hide(postid, isHide) {
     .catch((error) => {
       console.error("Error updating post:", error);
     });
-}
-
-function getCSRFToken() {
-  return document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("csrftoken="))
-    ?.split("=")[1];
 }
 
 function allpost() {
@@ -129,15 +173,29 @@ function allpost() {
                 src="${profileImageUrl}"
                 alt="Profile Picture"
                 class="profile_img">
-                <span class="user-name">${post.user.first_name} ${post.user.last_name}</span>
+                <span class="user-name">${post.user.first_name} ${
+          post.user.last_name
+        }</span>
                 </div>
-                <button class="follow-btn">Follow</button>
+                ${
+                  post.user.id != currentUserId
+                    ? `<button class="follow-btn">Follow</button>`
+                    : ""
+                }
                     <div class="post-options">
                 <button class="options-btn">⋮</button>
                 <div class="dropdown-menu">
                  <ul>
-                    <li><a href="#">Edit</a></li>
-                   <li><a href="#">Delete</a></li>
+                      ${
+                        post.user.id == currentUserId
+                          ? `<li><a href="#" onclick="createpost(${post.id})">Edit</a></li>`
+                          : ""
+                      }
+                       ${
+                         post.user.id == currentUserId
+                           ? `<li><a href="#" onclick="Delete(${post.id})">Delete</a></li>`
+                           : ""
+                       }
                    <li><a href="#" onclick="hide(${post.id},true)">Hide</a></li>
                  </ul>
                </div>

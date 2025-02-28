@@ -131,13 +131,25 @@ class PostViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         data = request.data  # Get request data
         
-        # Ensure 'hide' key is present in request
-        if "hide" in data:
-            instance.hide = data["hide"]
+         # Check if any update fields are provided in the request
+        if 'content' in data or 'hide' in data or 'image' in request.FILES:
+            # Update content if present in the request
+            if 'content' in data:
+                instance.content = data['content']
+            
+            # Update hide status if present in the request
+            if 'hide' in data:
+                instance.hide = data['hide']
+            
+            # Handle image update if a new image is provided
+            if 'image' in request.FILES:
+                instance.image = request.FILES['image']  # Update the image field
+
+            # Save the updated post instance
             instance.save()
+
             return Response({"message": "Post updated successfully"}, status=status.HTTP_200_OK)
+
         else:
+            # Return error response if no valid fields are provided
             return Response({"error": "Invalid data"}, status=status.HTTP_400_BAD_REQUEST)
-
-
-        

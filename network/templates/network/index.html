@@ -26,5 +26,8 @@
 </div>
 TODO
 <script src="{% static 'network/index.js' %}"></script>
+<script>
+  const currentUserId = "{{ request.user.id }}";
+</script>
 
 {% endblock %}
