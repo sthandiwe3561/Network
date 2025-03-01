@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post,User,ProfileSetup
+from .models import Post,User,ProfileSetup,Follow
 
 class ProfileSetupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,4 +21,12 @@ class PostSerializer(serializers.ModelSerializer):
   class Meta:
      model= Post
      fields = ('id','user','content','image','hide','created_at')
+
+class FollowSerializer(serializers.ModelSerializer):
+    follower = UserSerializer(read_only=True)
+    following = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Follow
+        fields = ('id','follower','following','created_at')
 
