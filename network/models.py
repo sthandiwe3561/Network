@@ -29,6 +29,7 @@ class Post(models.Model):
 class Follow(models.Model):
     follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name="following")  # User who follows
     following = models.ForeignKey(User, on_delete=models.CASCADE, related_name="followers")  # User being followed
+    follow_status = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

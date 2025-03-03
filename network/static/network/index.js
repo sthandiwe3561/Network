@@ -141,6 +141,28 @@ function hide(postid, isHide) {
     });
 }
 
+//Follow button function
+function followbutton(follower_id, following_id, type_method, buttonElement) {
+  if (type_method == "follow") {
+    console.log(follower_id);
+    console.log(following_id);
+
+    // Get all follow buttons for the same user
+    const followButtons = document.querySelectorAll(
+      `.follow-btn[data-user-id='${following_id}']`
+    );
+
+    // Change button text for all buttons related to this user
+    followButtons.forEach((button) => {
+      button.textContent = "Unfollow";
+      button.setAttribute(
+        "onclick",
+        `followbutton('${follower_id}', '${following_id}', 'unfollow', this)`
+      );
+    });
+  }
+}
+
 function allpost() {
   //show cratepost and hide other views
   document.querySelector("#createpost").style.display = "none";
@@ -164,6 +186,8 @@ function allpost() {
 
         const imageUrl = post.image ? post.image : `/media/default.jpg`;
 
+        let follow = "follow"; // or any value you want to check for in the function
+
         //posts layout
         postDiv.innerHTML = `
               <div class="post-container">
@@ -179,7 +203,7 @@ function allpost() {
                 </div>
                 ${
                   post.user.id != currentUserId
-                    ? `<button class="follow-btn">Follow</button>`
+                    ? `<button class="follow-btn" data-user-id="${post.user.id}" onclick="followbutton('${currentUserId}', '${post.user.id}','${follow}',this)">Follow</button>`
                     : ""
                 }
                     <div class="post-options">

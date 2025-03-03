@@ -21,6 +21,7 @@ urlpatterns = [
 
 router = DefaultRouter()
 router.register('post', views.PostViewSet)
+router.register('follow',views.FollowViewSet)
 urlpatterns += [
         path("", include(router.urls)),
 ]

@@ -3,8 +3,8 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from .serializers import UserSerializer, PostSerializer
-from .models import User, ProfileSetup,Post
+from .serializers import PostSerializer, FollowSerializer
+from .models import User, ProfileSetup,Post,Follow
 #import from rest_framework
 from rest_framework import status
 from rest_framework.response import Response
@@ -153,3 +153,24 @@ class PostViewSet(viewsets.ModelViewSet):
         else:
             # Return error response if no valid fields are provided
             return Response({"error": "Invalid data"}, status=status.HTTP_400_BAD_REQUEST)
+        
+class FollowViewSet(viewsets.ModelViewSet):
+    queryset = Follow.objects.all()
+    serializer_class = FollowSerializer
+    permission_classes = [AllowAny]
+
+    #create a create function for follow model validations
+    def perform_create(self, serializer):
+        #get data for follower and following
+        follower = self.request.data("follower")
+        following = self.request.data("following")
+
+        #make sure thatthe user is not following themselves
+        if follower == following:
+            return Response({"error": "Can not follow your self"}, status= status.HTTP_406_NOT_ACCEPTABLE)
+        
+        # make suer the are no duplicate
+        if Follow.objects.filter(follower=follower, following=following).exists():
+            return Response({"error":"You already follow this user"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
