@@ -8,7 +8,7 @@ class ProfileSetupSerializer(serializers.ModelSerializer):
 
 #user serializer
 class UserSerializer(serializers.ModelSerializer):
-    profile = ProfileSetupSerializer(read_only=True)  # Fetch related profile details
+    profile = ProfileSetupSerializer(read_only=True,  required=False)  # Fetch related profile details
 
     class Meta:
         model = User
@@ -28,5 +28,5 @@ class FollowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Follow
-        fields = ('id','follower','following','created_at')
+        fields = ('id','follower','following','follow_status','created_at')
 

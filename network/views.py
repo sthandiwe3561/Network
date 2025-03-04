@@ -8,7 +8,7 @@ from .models import User, ProfileSetup,Post,Follow
 #import from rest_framework
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes,action
 from rest_framework.permissions import IsAuthenticated,AllowAny,IsAuthenticatedOrReadOnly
 from rest_framework import viewsets
 
@@ -162,8 +162,8 @@ class FollowViewSet(viewsets.ModelViewSet):
     #create a create function for follow model validations
     def perform_create(self, serializer):
         #get data for follower and following
-        follower = self.request.data("follower")
-        following = self.request.data("following")
+        follower = self.request.data.get("follower")
+        following = self.request.data.get("following")
 
         #make sure thatthe user is not following themselves
         if follower == following:
@@ -173,4 +173,43 @@ class FollowViewSet(viewsets.ModelViewSet):
         if Follow.objects.filter(follower=follower, following=following).exists():
             return Response({"error":"You already follow this user"}, status=status.HTTP_400_BAD_REQUEST)
         
+        serializer.save(follower_id=follower, following_id=following)
+
+
         
+    # Custom action to check follow status
+    @action(detail=False, methods=["GET"], url_path="follow-status/(?P<follower_id>[^/.]+)/(?P<following_id>[^/.]+)")
+    def follow_status(self, request, follower_id, following_id):
+        """Check if the logged-in user is following another user."""
+        is_following = bool(Follow.objects.filter(follower=follower_id, following=following_id).exists())
+        return Response({"follow_status": is_following}, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=["DELETE"], url_path="unfollow/(?P<follower_id>[^/.]+)/(?P<following_id>[^/.]+)")
+    def unfollow(self, request, follower_id, following_id):
+          """Delete a follow relationship"""
+          try:
+             follow_instance = Follow.objects.get(follower_id=follower_id, following_id=following_id)
+             follow_instance.delete()
+             return Response({"message": "Unfollowed successfully"}, status=status.HTTP_204_NO_CONTENT)
+          except Follow.DoesNotExist:
+              return Response({"error": "Follow relationship not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Custom action to get posts from users the current user follows
+    @action(detail=False, methods=['GET'], url_path='following-posts/(?P<user_id>\d+)')
+    def following_posts(self, request, user_id):
+        """Retrieve posts only from users that the current user follows."""
+        
+        # Get a list of user IDs that the current user follows
+        following_users = Follow.objects.filter(follower_id=user_id).values_list("following_id", flat=True)
+        
+        print(f"User {user_id} follows: {list(following_users)}")  # Debugging
+
+        # Retrieve posts from those users
+        posts = Post.objects.filter(user_id__in=following_users).order_by('-created_at')
+
+        print(f"Posts retrieved: {posts.values()}")  # Debugging
+
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+   

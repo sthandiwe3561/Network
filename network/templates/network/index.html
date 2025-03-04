@@ -1,7 +1,7 @@
 {% extends "network/layout.html" %} {% load static %} {% block body %}
 <div id="allpost"></div>
 <div id="profile"></div>
-<div id="notifications"></div>
+<div id="following"></div>
 <div id="createpost">
   <form method="post" id="createpostform" enctype="multipart/form-data">
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />

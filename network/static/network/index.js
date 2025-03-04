@@ -8,6 +8,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   document.querySelector("#post").addEventListener("click", () => createpost());
+  document
+    .querySelector("#Following")
+    .addEventListener("click", () => FollowPost());
 });
 
 function getCSRFToken() {
@@ -27,7 +30,7 @@ function createpost(postId = null) {
   document.querySelector("#createpost").style.display = "block";
   document.querySelector("#allpost").style.display = "none";
   document.querySelector("#profile").style.display = "none";
-  document.querySelector("#notifications").style.display = "none";
+  document.querySelector("#following").style.display = "none";
 
   if (postId) {
     // If editing a post, set the editingPostId to the postId
@@ -92,7 +95,6 @@ function handlesubmit(event) {
     })
     .then((result) => {
       console.log(result);
-      console.log("helloit working");
       allpost(); // ✅ Ensure `allpost()` is defined and working
       editingPostId = null; // Reset editingPostId after successful submission
     })
@@ -142,117 +144,228 @@ function hide(postid, isHide) {
 }
 
 //Follow button function
-function followbutton(follower_id, following_id, type_method, buttonElement) {
-  if (type_method == "follow") {
-    console.log(follower_id);
-    console.log(following_id);
+function followbutton(follower_id, following_id, button) {
+  console.log(follower_id);
+  console.log(following_id);
 
-    // Get all follow buttons for the same user
-    const followButtons = document.querySelectorAll(
-      `.follow-btn[data-user-id='${following_id}']`
-    );
+  // Get all follow buttons for the same user
+  const followButtons = document.querySelectorAll(
+    `.follow-btn[data-user-id='${following_id}']`
+  );
 
-    // Change button text for all buttons related to this user
-    followButtons.forEach((button) => {
-      button.textContent = "Unfollow";
-      button.setAttribute(
-        "onclick",
-        `followbutton('${follower_id}', '${following_id}', 'unfollow', this)`
-      );
-    });
+  if (button.textContent === "Follow") {
+    // Send a request to follow the user
+    fetch("/follow/", {
+      method: "POST",
+      credentials: "include", // Ensures cookies (like sessionid) are sent
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCSRFToken(), // Ensure CSRF token is included
+      },
+      body: JSON.stringify({
+        follower: follower_id,
+        following: following_id,
+        follow_status: true,
+      }),
+    })
+      .then((response) => response.json())
+      .then(() => {
+        // Change button text for all buttons related to this user
+        followButtons.forEach((button) => {
+          button.textContent = "Unfollow";
+          button.setAttribute(
+            "onclick",
+            `followbutton('${follower_id}', '${following_id}', this)`
+          );
+        });
+        button.textContent = "Unfollow"; // Update button text
+      })
+      .catch((error) => console.error("Error following user:", error));
+  } else {
+    // Send a request to unfollow the user
+    fetch(`/follow/unfollow/${follower_id}/${following_id}/`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCSRFToken(), // Ensure CSRF token is included
+      },
+      body: JSON.stringify({
+        follower_status: false,
+      }),
+    })
+      .then(() => {
+        // Change button text for all buttons related to this user
+        followButtons.forEach((button) => {
+          button.textContent = "Follow";
+          button.setAttribute(
+            "onclick",
+            `followbutton('${follower_id}', '${following_id}', this)`
+          );
+        });
+        button.textContent = "Follow"; // Update button text
+      })
+      .catch((error) => console.error("Error unfollowing user:", error));
   }
 }
 
-function allpost() {
-  //show cratepost and hide other views
-  document.querySelector("#createpost").style.display = "none";
-  document.querySelector("#allpost").style.display = "block";
-  document.querySelector("#profile").style.display = "none";
-  document.querySelector("#notifications").style.display = "none";
+function PostDisplay(
+  filter = "",
+  onlyFollowing = false,
+  containerId = "allpost"
+) {
+  let url;
 
-  //fecth and display post
-  fetch("/post/")
+  if (onlyFollowing) {
+    url = `/follow/following-posts/${currentUserId}/`; // Fetch only posts from followed users
+  } else {
+    url = filter ? `/post/${filter}` : "/post/";
+  }
+
+  fetch(url)
     .then((response) => response.json())
     .then((eachpost) => {
-      //foreach post
+      // Ensure `eachpost` is always an array
+      if (!Array.isArray(eachpost)) {
+        eachpost = [eachpost]; // Convert single post into an array
+      }
+
+      const postContainer = document.getElementById(containerId);
+      postContainer.innerHTML = ""; // Clear previous posts (optional)
+
       eachpost.forEach((post) => {
         console.log(post);
-        //create a div for each post
+        console.log(eachpost);
+
+        // Ensure the post.user is defined before accessing post.user.id
+        if (post.user) {
+          const userId = post.user.id; // Safe access to user.id
+          console.log(userId); // Check if userId exists
+        } else {
+          console.log("User object is missing in post:", post);
+        }
+
         const postDiv = document.createElement("div");
 
-        // Access profile picture correctly
+        //const profileImageUrl = post.user.profile?.profile_picture || "/media/default.jpg";
+
+        // Ensure post.user is defined before accessing profile
         const profileImageUrl =
-          post.user.profile?.profile_picture || "/media/default.jpg";
+          post.user && post.user.profile
+            ? post.user.profile.profile_picture
+            : "/media/default.jpg";
+
+        const firstName = post.user ? post.user.first_name : "Unknown";
+        const lastName = post.user ? post.user.last_name : "User";
 
         const imageUrl = post.image ? post.image : `/media/default.jpg`;
 
-        let follow = "follow"; // or any value you want to check for in the function
-
-        //posts layout
         postDiv.innerHTML = `
-              <div class="post-container">
-               <div class="post-header">
-               <div class="user-info">
-               <img
-                src="${profileImageUrl}"
-                alt="Profile Picture"
-                class="profile_img">
-                <span class="user-name">${post.user.first_name} ${
-          post.user.last_name
-        }</span>
-                </div>
-                ${
-                  post.user.id != currentUserId
-                    ? `<button class="follow-btn" data-user-id="${post.user.id}" onclick="followbutton('${currentUserId}', '${post.user.id}','${follow}',this)">Follow</button>`
-                    : ""
-                }
-                    <div class="post-options">
+          <div class="post-container">
+            <div class="post-header">
+              <div class="user-info">
+                <img src="${profileImageUrl}" alt="Profile Picture" class="profile_img">
+                <span class="user-name">${firstName} ${lastName}</span>
+              </div>
+              ${
+                post.user.id != currentUserId
+                  ? `<button class="follow-btn" data-user-id="${post.user.id}" onclick="followbutton('${currentUserId}', '${post.user.id}',this)">Checking...</button>`
+                  : ""
+              }
+              <div class="post-options">
                 <button class="options-btn">⋮</button>
                 <div class="dropdown-menu">
-                 <ul>
-                      ${
-                        post.user.id == currentUserId
-                          ? `<li><a href="#" onclick="createpost(${post.id})">Edit</a></li>`
-                          : ""
-                      }
-                       ${
-                         post.user.id == currentUserId
-                           ? `<li><a href="#" onclick="Delete(${post.id})">Delete</a></li>`
-                           : ""
-                       }
-                   <li><a href="#" onclick="hide(${post.id},true)">Hide</a></li>
-                 </ul>
-               </div>
+                  <ul>
+                    ${
+                      post.user.id == currentUserId
+                        ? `<li><a href="#" onclick="createpost(${post.id})">Edit</a></li>`
+                        : ""
+                    }
+                    ${
+                      post.user.id == currentUserId
+                        ? `<li><a href="#" onclick="Delete(${post.id})">Delete</a></li>`
+                        : ""
+                    }
+                    <li><a href="#" onclick="hide(${
+                      post.id
+                    }, true)">Hide</a></li>
+                  </ul>
+                </div>
               </div>
-              </div>
-                <div class="post-content">${post.content}</div>
-                <div class="post-image"><img src="${imageUrl}" alt="Post Image"></div>
-                <div class="post-action"><button class="like-btn">like</button>
-                 <span class="comment"><a href="#">comments</a></span>
-                 </div>`;
+            </div>
+            <div class="post-content">${post.content}</div>
+            <div class="post-image"><img src="${imageUrl}" alt="Post Image"></div>
+            <div class="post-action">
+              <button class="like-btn">Like</button>
+              <span class="comment"><a href="#">Comments</a></span>
+            </div>
+          </div>`;
 
-        //dropdown
+        postContainer.appendChild(postDiv);
+
+        // Fetch follow status
+        fetch(`/follow/follow-status/${currentUserId}/${post.user.id}/`)
+          .then((response) => response.json())
+          .then((statusData) => {
+            const followButtons = document.querySelectorAll(
+              `[data-user-id="${post.user.id}"]`
+            );
+
+            followButtons.forEach((button) => {
+              button.textContent = statusData.follow_status
+                ? "Unfollow"
+                : "Follow";
+            });
+          })
+          .catch((error) => {
+            console.error("Error fetching follow status:", error);
+          });
+
+        // Dropdown Toggle (inside post)
         postDiv
           .querySelector(".options-btn")
           .addEventListener("click", (event) => {
-            event.stopPropagation(); // Prevents the click from bubbling up
+            event.stopPropagation(); // Prevents event bubbling
             let dropdown = postDiv.querySelector(".dropdown-menu");
             dropdown.style.display =
               dropdown.style.display === "block" ? "none" : "block";
           });
-
-        // Close the dropdown when clicking anywhere else
-        document.addEventListener("click", () => {
-          document.querySelectorAll(".dropdown-menu").forEach((menu) => {
-            menu.style.display = "none";
-          });
-        });
-
-        //append it on my html div forallpost
-        document.getElementById("allpost").appendChild(postDiv);
       });
     })
     .catch((error) => {
       console.error("Error fetching posts:", error);
     });
+
+  // Close dropdown when clicking outside (Added only once)
+  document.addEventListener(
+    "click",
+    () => {
+      document.querySelectorAll(".dropdown-menu").forEach((menu) => {
+        menu.style.display = "none";
+      });
+    },
+    { once: true }
+  );
+}
+
+function allpost() {
+  //show All post and hide other views
+  document.querySelector("#createpost").style.display = "none";
+  document.querySelector("#allpost").style.display = "block";
+  document.querySelector("#profile").style.display = "none";
+  document.querySelector("#following").style.display = "none";
+
+  //call postdisplay
+  PostDisplay("", false, "allpost");
+}
+
+function FollowPost() {
+  //show following and hide other views
+  document.querySelector("#createpost").style.display = "none";
+  document.querySelector("#allpost").style.display = "none";
+  document.querySelector("#profile").style.display = "none";
+  document.querySelector("#following").style.display = "block";
+
+  PostDisplay("", true, "following");
+
+  console.log("following");
 }
