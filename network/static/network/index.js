@@ -233,6 +233,12 @@ function PostDisplay(
 
       const postContainer = document.getElementById(containerId);
 
+      // If there are no posts, display a "No posts available" message
+      if (eachpost.length === 0) {
+        postContainer.innerHTML = '<p class="nopost">No posts available</p>';
+        return;
+      }
+
       eachpost.forEach((post) => {
         console.log(post);
         console.log(eachpost);

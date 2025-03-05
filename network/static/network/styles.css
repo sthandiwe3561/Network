@@ -132,6 +132,12 @@
 .dropdown-menu li:hover {
   background: #f5f5f5;
 }
+.nopost {
+  font-size: 90px;
+  text-align: center;
+  margin-top: 10%;
+  font-weight: bold;
+}
 
 /* Center the entire profile section in the middle of the screen */
 .profile_section {
