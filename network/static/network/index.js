@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .querySelector("#Following")
     .addEventListener("click", () => FollowPost());
+  document.querySelector("#Profile").addEventListener("click", () => profile());
 });
 
 function getCSRFToken() {
@@ -29,7 +30,8 @@ function createpost(postId = null) {
   //show cratepost and hide other views
   document.querySelector("#createpost").style.display = "block";
   document.querySelector("#allpost").style.display = "none";
-  document.querySelector("#profile").style.display = "none";
+  document.querySelector("#profile_page").style.display = "none";
+  document.querySelector("#profile_post").style.display = "none";
   document.querySelector("#following").style.display = "none";
 
   if (postId) {
@@ -230,7 +232,6 @@ function PostDisplay(
       }
 
       const postContainer = document.getElementById(containerId);
-      postContainer.innerHTML = ""; // Clear previous posts (optional)
 
       eachpost.forEach((post) => {
         console.log(post);
@@ -351,7 +352,8 @@ function allpost() {
   //show All post and hide other views
   document.querySelector("#createpost").style.display = "none";
   document.querySelector("#allpost").style.display = "block";
-  document.querySelector("#profile").style.display = "none";
+  document.querySelector("#profile_page").style.display = "none";
+  document.querySelector("#profile_post").style.display = "none";
   document.querySelector("#following").style.display = "none";
 
   //call postdisplay
@@ -362,10 +364,80 @@ function FollowPost() {
   //show following and hide other views
   document.querySelector("#createpost").style.display = "none";
   document.querySelector("#allpost").style.display = "none";
-  document.querySelector("#profile").style.display = "none";
+  document.querySelector("#profile_page").style.display = "none";
+  document.querySelector("#profile_post").style.display = "none";
   document.querySelector("#following").style.display = "block";
 
   PostDisplay("", true, "following");
 
   console.log("following");
+}
+
+function profileDisplay() {
+  fetch(`/user/${currentUserId}`)
+    .then((response) => response.json())
+    .then((profile) => {
+      let postContainer = document.getElementById("profile_page");
+      if (!postContainer) {
+        console.error("Error: profile_page not found in the DOM!");
+        return;
+      }
+
+      console.log("✅ profile_page found!");
+
+      //image
+      const profileImageUrl =
+        profile && profile.profile
+          ? profile.profile.profile_picture
+          : "/media/default.jpg";
+
+      let profileDiv = document.createElement("div");
+
+      profileDiv.innerHTML = `
+                            <div class="profile_section">
+                            <div class="section1"
+                            <img src="${profileImageUrl}" alt="Profile Picture" class="profile2_img">
+                            </div>
+                            <div class="section2">
+                            <h1>${profile.first_name} ${profile.last_name}</h1>
+                            <div class="following">
+                            <span><a href="#" id="following_count">Following</a></span>
+                            <span><a href="#" id="followers_count">Followers</a></span>
+                            </div>
+                            <p>${profile.profile.bio}</p>
+                            </div>
+                            </div>
+                            
+                            `;
+      postContainer.innerHTML = ""; // Clear the previous content of profile_page
+
+      postContainer.appendChild(profileDiv);
+
+      fetch(`/user/followers-count/${currentUserId}/`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.followers_count !== undefined) {
+            document.getElementById(
+              "followers_count"
+            ).innerText = `Followers: ${data.followers_count}`;
+          } else {
+            console.error("Failed to fetch followers count.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching followers count:", error);
+        });
+    });
+}
+
+function profile() {
+  //show following and hide other views
+  document.querySelector("#createpost").style.display = "none";
+  document.querySelector("#allpost").style.display = "none";
+  document.querySelector("#profile_page").style.display = "block";
+  document.querySelector("#profile_post").style.display = "block";
+  document.querySelector("#following").style.display = "none";
+
+  profileDisplay();
+  PostDisplay(currentUserId, false, "profile_post");
 }

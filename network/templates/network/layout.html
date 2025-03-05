@@ -25,7 +25,7 @@
         <ul class="navbar-nav mr-auto">
           {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link" href="#" id="profile">{{user.username}}</a>
+            <a class="nav-link" href="#" id="profile"></a>
           </li>
           {% endif %}
           <li class="nav-item">
@@ -43,7 +43,7 @@
             <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#" id="profile"
+            <a class="nav-link" href="#" id="Profile"
               ><img
                 src="{{ user.profile.profile_picture.url }}"
                 alt="Profile Picture"

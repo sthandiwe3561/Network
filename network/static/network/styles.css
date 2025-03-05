@@ -93,11 +93,6 @@
   align-items: center;
   gap: 10px; /* Space between Follow button and ⋮ dropdown */
 }
-/*
-.post-options {
-  position: relative;
-  display: inline-block;
-}*/
 
 .options-btn {
   background: none;
@@ -136,4 +131,59 @@
 
 .dropdown-menu li:hover {
   background: #f5f5f5;
+}
+
+/* Center the entire profile section in the middle of the screen */
+.profile_section {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  align-items: center;
+}
+
+.profile2_img {
+  width: 250px; /* Bigger profile picture */
+  height: 250px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Right column - Profile details 
+.section2 {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}*/
+
+.section2 h1 {
+  font-size: 42px; /* Much larger name */
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #000;
+}
+
+/* Following & Followers links */
+.following {
+  display: flex;
+  gap: 40px; /* More spacing between links */
+  margin-bottom: 20px;
+}
+
+.following a {
+  text-decoration: none;
+  color: #000;
+  font-size: 24px; /* Bigger font */
+  font-weight: bold;
+}
+
+.following a:hover {
+  color: #555;
+}
+
+/* Bio text */
+.section2 p {
+  font-size: 20px; /* Bigger text */
+  color: #333;
+  max-width: 600px;
+  line-height: 1.6;
 }

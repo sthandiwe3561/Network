@@ -3,14 +3,17 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from .serializers import PostSerializer, FollowSerializer
+from .serializers import PostSerializer, FollowSerializer,UserSerializer
 from .models import User, ProfileSetup,Post,Follow
 #import from rest_framework
+from rest_framework.pagination import PageNumberPagination
+from .pagination import PostPagination  # Import custom pagination
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes,action
 from rest_framework.permissions import IsAuthenticated,AllowAny,IsAuthenticatedOrReadOnly
 from rest_framework import viewsets
+
 
 
 
@@ -158,6 +161,8 @@ class FollowViewSet(viewsets.ModelViewSet):
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer
     permission_classes = [AllowAny]
+    pagination_class = PostPagination  # Enable pagination for this view
+
 
     #create a create function for follow model validations
     def perform_create(self, serializer):
@@ -195,7 +200,7 @@ class FollowViewSet(viewsets.ModelViewSet):
               return Response({"error": "Follow relationship not found"}, status=status.HTTP_404_NOT_FOUND)
 
     # Custom action to get posts from users the current user follows
-    @action(detail=False, methods=['GET'], url_path='following-posts/(?P<user_id>\d+)')
+    @action(detail=False, methods=['GET'], url_path=r'following-posts/(?P<user_id>\d+)')
     def following_posts(self, request, user_id):
         """Retrieve posts only from users that the current user follows."""
         
@@ -212,4 +217,35 @@ class FollowViewSet(viewsets.ModelViewSet):
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-   
+class UserViewSet(viewsets.ModelViewSet):
+     queryset = User.objects.all()
+     serializer_class = UserSerializer
+     permission_classes = [AllowAny]
+
+
+     # Custom action to get followers count for a user
+     @action(detail=False, methods=['GET'], url_path=r'followers-count/(?P<user_id>\d+)')
+     def followers_count(self, request, user_id):
+        """Retrieve the number of followers for a specific user."""
+        try:
+            user = User.objects.get(id=user_id)
+            # Count followers using the 'following' field in the Follow model
+            followers_count = Follow.objects.filter(following=user).count()
+            return Response({"followers_count": followers_count}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+     # Custom action to get following count for a user
+     @action(detail=False, methods=['GET'], url_path=r'following-count/(?P<user_id>\d+)')
+     def following_count(self, request, user_id):
+        """Retrieve the number of people a user is following."""
+        try:
+            user = User.objects.get(id=user_id)
+            # Count following using the 'follower' field in the Follow model
+            following_count = Follow.objects.filter(follower=user).count()
+            return Response({"following_count": following_count}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+

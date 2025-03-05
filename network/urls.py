@@ -20,8 +20,10 @@ urlpatterns = [
 ]
 
 router = DefaultRouter()
-router.register('post', views.PostViewSet, basename="post")
-router.register('follow',views.FollowViewSet, basename="follow")
+router.register('post', views.PostViewSet, basename="post"),
+router.register('follow',views.FollowViewSet, basename="follow"),
+router.register('user',views.UserViewSet, basename="user"),
+
 urlpatterns += [
         path("", include(router.urls)),
 ]
