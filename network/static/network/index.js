@@ -373,8 +373,8 @@ function FollowPost() {
   console.log("following");
 }
 
-function profileDisplay() {
-  fetch(`/user/${currentUserId}`)
+function profileDisplay(userid) {
+  fetch(`/user/${userid}`)
     .then((response) => response.json())
     .then((profile) => {
       let postContainer = document.getElementById("profile_page");
@@ -413,24 +413,37 @@ function profileDisplay() {
 
       postContainer.appendChild(profileDiv);
 
-      fetch(`/user/followers-count/${currentUserId}/`)
+      //followers count
+      fetch(`/user/followers-count/${userid}/`)
         .then((response) => response.json())
         .then((data) => {
           if (data.followers_count !== undefined) {
             document.getElementById(
               "followers_count"
             ).innerText = `Followers: ${data.followers_count}`;
-          } else {
-            console.error("Failed to fetch followers count.");
           }
         })
         .catch((error) => {
           console.error("Error fetching followers count:", error);
         });
+
+      //following count
+      fetch(`/user/following-count/${userid}/`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.following_count !== undefined) {
+            document.getElementById(
+              "following_count"
+            ).innerText = `Following: ${data.following_count}`;
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching following count:", error);
+        });
     });
 }
 
-function profile() {
+function profile(profileid = currentUserId) {
   //show following and hide other views
   document.querySelector("#createpost").style.display = "none";
   document.querySelector("#allpost").style.display = "none";
@@ -438,6 +451,6 @@ function profile() {
   document.querySelector("#profile_post").style.display = "block";
   document.querySelector("#following").style.display = "none";
 
-  profileDisplay();
-  PostDisplay(currentUserId, false, "profile_post");
+  profileDisplay(profileid);
+  PostDisplay(profileid, false, "profile_post");
 }
