@@ -22,6 +22,7 @@ class Post(models.Model):
     image = models.ImageField(upload_to="posts/", blank=True, null=True, default="default.jpg")  # Optional field
     created_at = models.DateTimeField(auto_now_add=True)
     hide = models.BooleanField(default=False)
+    likes = models.ManyToManyField(User, related_name="liked_posts", blank=True)  # Users who liked the post
 
     def __str__(self):
         return f"Post by {self.user.username} - {self.created_at.strftime('%Y-%m-%d')}"
