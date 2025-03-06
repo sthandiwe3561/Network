@@ -20,7 +20,7 @@ class PostSerializer(serializers.ModelSerializer):
 
   class Meta:
      model= Post
-     fields = ('id','user','content','image','hide','created_at')
+     fields = ('id','user','content','image','hide','like','created_at')
 
 class FollowSerializer(serializers.ModelSerializer):
     follower = UserSerializer(read_only=True)

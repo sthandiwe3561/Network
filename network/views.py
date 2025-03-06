@@ -157,6 +157,28 @@ class PostViewSet(viewsets.ModelViewSet):
             # Return error response if no valid fields are provided
             return Response({"error": "Invalid data"}, status=status.HTTP_400_BAD_REQUEST)
         
+    @action(detail=True, methods=['GET', 'POST', 'DELETE'], url_path='like')
+    def like(self, request, pk= None):
+        """GET: Check if a user liked a post  
+           POST: Like a post for a user  
+           DELETE: Unlike a post for a user"""
+        post = self.get_object()  # Fetch the post instance using pk
+        user = request.user  # Get the authenticated user
+
+        if request.method == "GET":
+            liked = post.likes.filter(id=user.id).exists()
+            return Response({"liked": liked}, status=200)
+
+        if request.method == "POST":
+           post.likes.add(user)
+           return Response({"message": "Post liked"}, status=200)
+
+        if request.method == "DELETE":
+            post.likes.remove(user)
+            return Response({"message": "Post unliked"}, status=200)
+            
+
+        
 class FollowViewSet(viewsets.ModelViewSet):
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer
@@ -216,6 +238,7 @@ class FollowViewSet(viewsets.ModelViewSet):
 
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
 
 class UserViewSet(viewsets.ModelViewSet):
      queryset = User.objects.all()
