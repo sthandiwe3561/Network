@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -67,19 +68,19 @@ def register(request):
             return render(request, "network/register.html", {
                 "message": "Username already taken."
             })
-        login(request, user)
         return HttpResponseRedirect(reverse("profile_setup"))
     else:
         return render(request, "network/register.html")
 
+@login_required
 def profile_setup(request):
     #fetch User data and accesing profile
     current_user = request.user
     profile = ProfileSetup.objects.filter(user=current_user).first()
     if request.method == "POST":
         #fetch input data
-        first_name = request.POST["first_name"]
-        last_name = request.POST["last_name"]
+        first_name = request.POST["first_name"].capitalize()
+        last_name = request.POST["last_name"].capitalize()
         date_birth = request.POST["date_of_birth"]
         location = request.POST["location"]
         email = request.POST["email"]
@@ -90,8 +91,7 @@ def profile_setup(request):
         current_user.first_name = first_name
         current_user.last_name = last_name
 
-        if current_user.email is not email:
-            current_user.email = email
+        current_user.email = email
         current_user.save()
         #saving data in profile_setup model
          # Saving data in profile_setup model
@@ -110,6 +110,7 @@ def profile_setup(request):
                 bio=bio,
                 profile_picture=profile_picture
             )
+        login(request, current_user)
 
         return HttpResponseRedirect(reverse("index"))
 
@@ -126,6 +127,12 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Assigns the authenticated user to the post before saving."""
         serializer.save(user=self.request.user)
+
+    def get_serializer_context(self):
+        """Override the context to pass the current user."""
+        context = super().get_serializer_context()
+        context['request'] = self.request  # Add the request to the context
+        return context
     
     #it is to update some fields because viewset class when you use PUT it expect you to update all the  fields so this 
     #is to add an extra condition so the class will be able to also PUT some fileds not only all of them
@@ -157,25 +164,37 @@ class PostViewSet(viewsets.ModelViewSet):
             # Return error response if no valid fields are provided
             return Response({"error": "Invalid data"}, status=status.HTTP_400_BAD_REQUEST)
         
-    @action(detail=True, methods=['GET', 'POST', 'DELETE'], url_path='like')
-    def like(self, request, pk= None):
+    @action(detail=True, methods=['GET', 'POST', 'DELETE'], url_path=r'like/(?P<user_id>\d+)')
+    def like(self, request, pk= None, user_id=None):
         """GET: Check if a user liked a post  
            POST: Like a post for a user  
            DELETE: Unlike a post for a user"""
         post = self.get_object()  # Fetch the post instance using pk
-        user = request.user  # Get the authenticated user
+        try:
+            user = User.objects.get(id=user_id)  # Get the user from `user_id`
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=404)
 
+        if request.method == "DELETE":
+          print(f"User {user.id} is unliking Post {post.id}")  # Debugging
+
+          post.likes.remove(user)
+          post.save()  # Ensure it's saved
+          return Response({"message": "Post unliked","liked": False, "like_count": post.likes.count()}, status=200)
+
+    
         if request.method == "GET":
             liked = post.likes.filter(id=user.id).exists()
-            return Response({"liked": liked}, status=200)
+            like_count = post.likes.count()  # Get the total number of likes on the post
+
+            return Response({"liked": liked,
+                            "like_count": like_count}, status=200)
 
         if request.method == "POST":
            post.likes.add(user)
-           return Response({"message": "Post liked"}, status=200)
-
-        if request.method == "DELETE":
-            post.likes.remove(user)
-            return Response({"message": "Post unliked"}, status=200)
+           post.save()
+           return Response({"message": "Post liked", "liked":True, "like_count": post.likes.count()}, status=200)
+        return Response({"message": "Already liked"}, status=400)
             
 
         

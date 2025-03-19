@@ -144,22 +144,18 @@
   display: grid;
   grid-template-columns: 1fr 2fr;
   align-items: center;
+  margin-left: 20%;
+  margin-top: 30px;
 }
-
 .profile2_img {
   width: 250px; /* Bigger profile picture */
   height: 250px;
   border-radius: 50%;
   object-fit: cover;
 }
-
-/* Right column - Profile details 
-.section2 {
-  flex: 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}*/
+#profile_post {
+  margin-top: 10%;
+}
 
 .section2 h1 {
   font-size: 42px; /* Much larger name */

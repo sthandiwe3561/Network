@@ -210,6 +210,36 @@ function followbutton(follower_id, following_id, button) {
   }
 }
 
+//like function
+function like(postId, button) {
+  const method = button.classList.contains("liked") ? "DELETE" : "POST";
+
+  fetch(`/post/${postId}/like/${currentUserId}/`, {
+    // Ensure URL matches backend
+    method: method,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": getCSRFToken(),
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data.liked);
+
+      // Update the like count displayed inside the button
+      const likeCountSpan = button.querySelector(".like-count");
+      if (data.liked) {
+        button.classList.add("liked");
+        likeCountSpan.textContent = data.like_count; // Update the like count
+      } else {
+        button.classList.remove("liked");
+        likeCountSpan.textContent = data.like_count; // Update the like count
+      }
+    })
+    .catch((error) => console.error("Error:", error));
+}
+
 function PostDisplay(
   filter = "",
   onlyFollowing = false,
@@ -302,12 +332,19 @@ function PostDisplay(
             <div class="post-content">${post.content}</div>
             <div class="post-image"><img src="${imageUrl}" alt="Post Image"></div>
             <div class="post-action">
-              <button class="like-btn">Like</button>
+               <button class="like-btn" onclick="like('${
+                 post.id
+               }', this)"><span class="like-count">${
+          post.like_count
+        }</span> likes
+      </button>
               <span class="comment"><a href="#">Comments</a></span>
             </div>
           </div>`;
 
         postContainer.appendChild(postDiv);
+
+        //likes number
 
         // Fetch follow status
         fetch(`/follow/follow-status/${currentUserId}/${post.user.id}/`)
@@ -392,18 +429,16 @@ function profileDisplay(userid) {
       console.log("✅ profile_page found!");
 
       //image
-      const profileImageUrl =
-        profile && profile.profile
-          ? profile.profile.profile_picture
-          : "/media/default.jpg";
+
+      const profileImage = profile.profile.profile_picture
+        ? profile.profile.profile_picture
+        : `/media/default.jpg`;
 
       let profileDiv = document.createElement("div");
 
       profileDiv.innerHTML = `
                             <div class="profile_section">
-                            <div class="section1"
-                            <img src="${profileImageUrl}" alt="Profile Picture" class="profile2_img">
-                            </div>
+                            <img src="${profileImage}" alt="Profile Picture" class="profile2_img">
                             <div class="section2">
                             <h1>${profile.first_name} ${profile.last_name}</h1>
                             <div class="following">

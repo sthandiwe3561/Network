@@ -17,10 +17,25 @@ class UserSerializer(serializers.ModelSerializer):
 #api/serializer for post
 class PostSerializer(serializers.ModelSerializer):
   user = UserSerializer(read_only=True)
+  liked = serializers.SerializerMethodField()  # Dynamically computed field
+  like_count = serializers.SerializerMethodField()
+
 
   class Meta:
      model= Post
-     fields = ('id','user','content','image','hide','like','created_at')
+     fields = ('id','user','content','image','hide','likes','created_at','liked','like_count')
+
+  def get_liked(self, obj):
+        """Check if the current user has liked this post."""
+        request = self.context.get('request')  # Get the request context
+
+        if request and request.user.is_authenticated:
+            return obj.likes.filter(id=request.user.id).exists()
+        return False  # If user is not authenticated, return False
+  
+  def get_like_count(self, obj):
+        return obj.likes.count()
+
 
 class FollowSerializer(serializers.ModelSerializer):
     follower = UserSerializer(read_only=True)
