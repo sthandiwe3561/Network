@@ -1,7 +1,9 @@
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path,include
+from django.urls import path,include,re_path
 from rest_framework.routers import DefaultRouter
+from django.views.generic import TemplateView
+
 
 from . import views
 
@@ -26,6 +28,7 @@ router.register('user',views.UserViewSet, basename="user"),
 
 urlpatterns += [
         path("", include(router.urls)),
+        re_path(r"^.*$", TemplateView.as_view(template_name="network/layout.html")),  # Catch-all for React
 ]
 
 # Serve media files in development mode

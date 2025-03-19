@@ -9,6 +9,9 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 
+    <!-- React Router -->
+    <script src="https://unpkg.com/react-router-dom@6/umd/react-router-dom.development.js"></script>
+
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -62,6 +65,13 @@
       </div>
     </nav>
 
+    <!-- Login/Register Pages Use This -->
     <div class="body">{% block body %} {% endblock %}</div>
+
+    <!-- React Renders Here -->
+    <div id="root"></div>
+
+    <!-- Load React App -->
+    <script type="text/babel" src="{% static 'network/app.js' %}"></script>
   </body>
 </html>
