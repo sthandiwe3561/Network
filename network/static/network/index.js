@@ -286,10 +286,9 @@ function PostDisplay(
         //const profileImageUrl = post.user.profile?.profile_picture || "/media/default.jpg";
 
         // Ensure post.user is defined before accessing profile
-        const profileImageUrl =
-          post.user && post.user.profile
-            ? post.user.profile.profile_picture
-            : "/media/default.jpg";
+        const profileImageUrl = post.user.profile
+          ? post.user.profile.profile_picture
+          : "/media/default.jpg";
 
         const firstName = post.user ? post.user.first_name : "Unknown";
         const lastName = post.user ? post.user.last_name : "User";

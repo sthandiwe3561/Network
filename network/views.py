@@ -64,6 +64,9 @@ def register(request):
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
+
+            # Log in the user immediately after registration
+            login(request, user)
         except IntegrityError:
             return render(request, "network/register.html", {
                 "message": "Username already taken."
@@ -72,7 +75,6 @@ def register(request):
     else:
         return render(request, "network/register.html")
 
-@login_required
 def profile_setup(request):
     #fetch User data and accesing profile
     current_user = request.user
@@ -110,7 +112,6 @@ def profile_setup(request):
                 bio=bio,
                 profile_picture=profile_picture
             )
-        login(request, current_user)
 
         return HttpResponseRedirect(reverse("index"))
 

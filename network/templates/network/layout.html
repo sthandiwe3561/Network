@@ -18,6 +18,8 @@
       integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
       crossorigin="anonymous"
     />
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
     <link href="{% static 'network/styles.css' %}" rel="stylesheet" />
   </head>
   <body>
@@ -68,10 +70,11 @@
     <!-- Login/Register Pages Use This -->
     <div class="body">{% block body %} {% endblock %}</div>
 
-    <!-- React Renders Here -->
-    <div id="root"></div>
-
-    <!-- Load React App -->
-    <script type="text/babel" src="{% static 'network/app.js' %}"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+      AOS.init({
+        duration: 2000,
+      });
+    </script>
   </body>
 </html>

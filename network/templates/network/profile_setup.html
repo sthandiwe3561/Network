@@ -1,29 +1,35 @@
 {% extends "network/layout.html" %} {% block body %}
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
+<div class="profile_setup">
+  <h1>Profile SetUp</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
 
-  <label>First Name:</label>
-  <input type="text" name="first_name" /><br />
+    <label>First Name:</label>
+    <input type="text" class="form-control" name="first_name" /><br />
 
-  <label>Last Name:</label>
-  <input type="text" name="last_name" /><br />
+    <label>Last Name:</label>
+    <input type="text" class="form-control" name="last_name" /><br />
 
-  <label>Email:</label>
-  <input type="email" name="email" value="{{ user.email }}" /><br />
+    <label>Email:</label>
+    <input
+      type="email"
+      name="email"
+      class="form-control"
+      value="{{ user.email }}"
+    /><br />
 
-  <label>Date of Birth:</label>
-  <input type="date" name="date_of_birth" /><br />
+    <label>Date of Birth:</label>
+    <input type="date" class="form-control" name="date_of_birth" /><br />
 
-  <label>Location:</label>
-  <input type="text" name="location" /><br />
+    <label>Location:</label>
+    <input type="text" class="form-control" name="location" /><br />
 
-  <label>Profile Picture:</label>
-  <input type="file" name="profile_picture" /><br />
+    <label>Profile Picture:</label>
+    <input type="file" class="form-control" name="profile_picture" /><br />
 
-  <label>Bio</label>
-  <textarea type="text" name="bio"></textarea>
-
-  <button type="submit">Save Changes</button>
-</form>
-
+    <div><label>Bio:</label></div>
+    <textarea type="text" class="form-textarea" name="bio"></textarea>
+    <div class="butt"><button type="submit">Save Changes</button></div>
+  </form>
+</div>
 {% endblock %}
