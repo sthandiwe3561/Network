@@ -254,3 +254,95 @@
   border-radius: 11px;
   width: 60%;
 }
+
+/*post form*/
+/* Form Container */
+.form-container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form-container h3 {
+  text-align: center;
+}
+
+#all h1 {
+  text-align: center;
+}
+/* Form Group Styles */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-container textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  resize: none;
+}
+
+.form-container textarea:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+.form-container label {
+  font-size: 14px;
+  color: #333;
+}
+
+.form-container input[type="file"] {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  width: 100%;
+}
+
+/* Upload Image Label Style */
+.image-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #3498db;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+  background-color: #2980b9;
+}
+
+/* Form Focus Styles */
+.submit-btn:focus {
+  outline: none;
+}
+
+/* Responsiveness */
+@media (max-width: 600px) {
+  .form-container {
+    margin: 10px;
+    padding: 15px;
+  }
+
+  .submit-btn {
+    font-size: 14px;
+  }
+}

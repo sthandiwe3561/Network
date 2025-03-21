@@ -249,17 +249,17 @@ function PostDisplay(
 
   if (onlyFollowing) {
     url = `/follow/following-posts/${currentUserId}/`; // Fetch only posts from followed users
+  } else if (filter) {
+    url = `/post/${filter}/`; // Fetch a specific post by ID
   } else {
-    url = filter ? `/post/${filter}` : "/post/";
+    url = "/post/"; // Fetch all posts
   }
 
   fetch(url)
     .then((response) => response.json())
     .then((eachpost) => {
       // Ensure `eachpost` is always an array
-      if (!Array.isArray(eachpost)) {
-        eachpost = [eachpost]; // Convert single post into an array
-      }
+      eachpost = Array.isArray(eachpost) ? eachpost : [eachpost];
 
       const postContainer = document.getElementById(containerId);
 
@@ -286,7 +286,7 @@ function PostDisplay(
         //const profileImageUrl = post.user.profile?.profile_picture || "/media/default.jpg";
 
         // Ensure post.user is defined before accessing profile
-        const profileImageUrl = post.user.profile
+        const profileImageUrl = post.user
           ? post.user.profile.profile_picture
           : "/media/default.jpg";
 

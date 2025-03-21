@@ -1,35 +1,40 @@
 {% extends "network/layout.html" %} {% load static %} {% block body %}
-<div id="allpost"></div>
-<div id="profile_page"></div>
-<div id="profile_post">
-  <h1>Post</h1>
+<div data-page="all" id="all">
+  {% if user.is_authenticated %}
+  <div class="form-container">
+    <h3>Create Post</h3>
+    <form method="post" id="form" enctype="multipart/form-data">
+      <input
+        type="hidden"
+        name="csrfmiddlewaretoken"
+        value="{{ csrf_token }}"
+      />
+      {% csrf_token %}
+
+      <div class="form-group">
+        <textarea
+          id="contant"
+          name="content"
+          class="form-control"
+          placeholder="What's on your mind?"
+          rows="3"
+        ></textarea>
+      </div>
+      <div class="form-group mt-2">
+        <label for="image">Upload an image (optional):</label>
+        <input type="file" id="image" name="image" class="form-control-file" />
+      </div>
+
+      <button type="submit">Post</button>
+    </form>
+  </div>
+  {% endif %}
+  <h1>All Post</h1>
+  <div id="postList"></div>
+
+  <script src="{% static 'network/post.js' %}"></script>
+  <script>
+    const currentUserId = "{{ request.user.id }}";
+  </script>
 </div>
-<div id="following"></div>
-<div id="createpost">
-  <form method="post" id="createpostform" enctype="multipart/form-data">
-    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
-    {% csrf_token %}
-
-    <div class="form-group">
-      <textarea
-        id="texterea"
-        name="content"
-        class="form-control"
-        placeholder="What's on your mind?"
-        rows="3"
-      ></textarea>
-    </div>
-    <div class="form-group mt-2">
-      <label for="image">Upload an image (optional):</label>
-      <input type="file" id="image" name="image" class="form-control-file" />
-    </div>
-
-    <button type="submit">Post</button>
-  </form>
-</div>
-<script src="{% static 'network/index.js' %}"></script>
-<script>
-  const currentUserId = "{{ request.user.id }}";
-</script>
-
 {% endblock %}
