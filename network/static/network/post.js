@@ -15,6 +15,29 @@ document.addEventListener("DOMContentLoaded", function () {
     apiURL = `/post/${currentuserId}/`;
   }
 
+  function attachDropdownEvents(postDiv) {
+    const optionsButton = postDiv.querySelector(".options-btn");
+    const dropdownMenu = postDiv.querySelector(".dropdown-menu");
+
+    optionsButton.addEventListener("click", function (event) {
+      event.stopPropagation(); // Prevent click from bubbling up
+      closeAllDropdowns(); // Close other open dropdowns first
+      dropdownMenu.classList.toggle("show"); // Toggle visibility
+    });
+  }
+
+  // Function to close all open dropdowns
+  function closeAllDropdowns() {
+    document.querySelectorAll(".dropdown-menu").forEach((menu) => {
+      menu.classList.remove("show");
+    });
+  }
+
+  // Close dropdowns when clicking outside
+  document.addEventListener("click", function () {
+    closeAllDropdowns();
+  });
+
   //getCSRFToken function for forms
   function getCSRFToken() {
     return (
@@ -69,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
               }
               <div class="post-options">
                 <button class="options-btn">⋮</button>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu hidden">
                   <ul>
                     ${
                       post.user.id == currentUserId
@@ -91,15 +114,20 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="post-content">${post.content}</div>
             <div class="post-image"><img src="${imageUrl}" alt="Post Image"></div>
             <div class="post-action">
-               <button class="like-btn" onclick="like('${
-                 post.id
-               }', this)"><span class="like-count">${
-      post.like_count
-    }</span> likes
+               <button class="like-btn"><span class="like-count">${
+                 post.like_count
+               }</span> likes
       </button>
               <span class="comment"><a href="#">Comments</a></span>
             </div>
           </div>`;
+
+    attachDropdownEvents(postDiv); // Attach event to new post
+
+    // Attach like button event listener
+    postDiv.querySelector(".like-btn").addEventListener("click", function () {
+      like(post.id, this);
+    });
 
     return postDiv;
   }
@@ -131,5 +159,34 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  //function for like
+  function like(postId, button) {
+    const method = button.classList.contains("liked") ? "DELETE" : "POST";
+
+    fetch(`/post/${postId}/like/${currentUserId}/`, {
+      // Ensure URL matches backend
+      method: method,
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCSRFToken(),
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data.liked);
+
+        // Update the like count displayed inside the button
+        const likeCountSpan = button.querySelector(".like-count");
+        if (data.liked) {
+          button.classList.add("liked");
+          likeCountSpan.textContent = data.like_count; // Update the like count
+        } else {
+          button.classList.remove("liked");
+          likeCountSpan.textContent = data.like_count; // Update the like count
+        }
+      })
+      .catch((error) => console.error("Error:", error));
+  }
   loadPosts();
 });
