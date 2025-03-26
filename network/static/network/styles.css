@@ -1,0 +1,36 @@
+/*create_profile*/
+.profile_setup h1 {
+  text-align: center;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+.profile_setup {
+  padding: 20px 90px;
+}
+
+.profile_setup input {
+  box-shadow: 2px 7px rgba(0, 0, 0, 0.4);
+  margin-bottom: 20px;
+
+  width: 60%;
+}
+.profile_setup label {
+  font-size: 20px;
+}
+.profile_setup button {
+  background: #000;
+  margin-top: 10px;
+  color: #fff;
+  padding: 10px 20px;
+}
+.profile_setup textarea {
+  box-shadow: 2px 7px rgba(0, 0, 0, 0.4);
+  border-radius: 11px;
+  width: 60%;
+}
+.profile_setup form {
+  margin: 50px auto; /* Auto margin on left and right centers it horizontally */
+  padding: 20px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+}

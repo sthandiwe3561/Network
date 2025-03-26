@@ -1,7 +1,14 @@
 {% extends "network/layout.html" %} {% block body %}
-<form action="{% url 'profile' %}" method="POST" enctype="multipart/form-data">
-  {% csrf_token %}
-  <div class="form-group">
+<div class="profile_setup">
+  <h1>Profile SetUp</h1>
+  <form
+    action="{% url 'profile' %}"
+    method="POST"
+    enctype="multipart/form-data"
+  >
+    {% csrf_token %}
+
+    <label>Username:</label>
     <input
       autofocus
       class="form-control"
@@ -9,18 +16,16 @@
       name="username"
       placeholder="Username"
     />
-  </div>
-  <div class="form-group">
+    <label>Upload Image:</label><br />
     <input type="file" name="image" accept="image/*" multiple />
-  </div>
-  <div class="form-group">
+    <div><label>Bio:</label></div>
     <textarea
       rows="4"
       cols="50"
       name="description"
       placeholder="Enter your text here..."
     ></textarea>
-  </div>
-  <input class="btn btn-primary" type="submit" value="create" />
-</form>
+    <div><button type="submit">Create</button></div>
+  </form>
+</div>
 {% endblock %}
