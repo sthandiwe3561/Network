@@ -1,10 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.urls import reverse
 
-from .models import User
+from .models import User,Profile
 
 
 def index(request):
@@ -58,6 +59,30 @@ def register(request):
                 "message": "Username already taken."
             })
         login(request, user)
-        return HttpResponseRedirect(reverse("create_profile"))
+        return redirect("profile")
     else:
         return render(request, "network/register.html")
+    
+@login_required   
+def profile(request):
+    if request.method == 'POST':
+        #fecthing data from create_profile form
+        username = request.POST.get("username")
+        bio = request.POST.get("description")
+        image = request.FILES.get("image")
+
+        #save the fields   
+        # Ensure the logged-in user has a profile
+        profile, created = Profile.objects.get_or_create(user=request.user)
+
+        # Assign form values to the profile
+        profile.username = username
+        profile.bio = bio
+        #check if the is an image uploaded
+        if image:
+            profile.image = image
+        profile.save()
+
+        return redirect ("index")
+    
+    return render(request,"network/create_profile.html")
