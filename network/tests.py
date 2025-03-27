@@ -2,10 +2,11 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
-from network.models import Profile
+from network.models import Profile,Post
 import io
 from PIL import Image
 
+"""Tessting Profile"""
 # Create your tests here.
 class ProfileModelTest(TestCase):
     def setUp(self):
@@ -71,6 +72,37 @@ class ProfileViewTest(TestCase):
         self.assertEqual(response.status_code, 302)  # Should redirect to index
         self.assertTrue(Profile.objects.filter(user=self.user, username="new_username").exists())
             
+"""Testing Post"""
+#testing post model
+class PostModelTest(TestCase):
+
+    #create a test case to test with
+    def setUp(self):
+        #creating a user
+        User = get_user_model()
+        self.user = User.objects.create_user(username="sthandiwe", password="password123")
+
+        #create an image to put in image field for test
+        image_file = io.BytesIO()
+        image = Image.new("RGB", (100, 100), color=(255, 0, 0))
+        image.save(image_file, format="PNG")
+        image_file.name = "test_image.png"
+        image_file.seek(0)
+
+        #creating data for post fields
+        self.post = Post.objects.create(user = self.user, 
+                                        content = "God is all I have",
+                                        image=SimpleUploadedFile(image_file.name, image_file.read())  # Add the image here
+                                               )
+        
+    #test function
+    def test_post(self):
+        print(f"Image path: {self.post.image.name}")
+
+        self.assertEqual(self.post.content, "God is all I have")
+        self.assertTrue(self.post.image.name.startswith('posts/test_image'))
+
+
 
 
 
