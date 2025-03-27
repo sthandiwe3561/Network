@@ -2,10 +2,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse
 
-from .models import User,Profile
+from .models import User,Profile,Post
 
 
 def index(request):
@@ -86,3 +86,34 @@ def profile(request):
         return redirect ("index")
     
     return render(request,"network/create_profile.html")
+
+def create_or_edit_post(request, post_id=None):
+
+    #fecthing the users id 
+    user = request.user
+    
+    if post_id:
+        post = get_object_or_404(Post, id=post_id)
+
+        if post.user != user:
+            return redirect("error_page")
+    else:
+        post = None
+    
+    if request.method == "POST":
+       #fetching data form the form
+       content = request.POST.get("content")
+       image = request.FILES.get("image")
+    
+       if post:
+          post.content = content
+          if image:
+              post.image = image
+          post.save()
+       else:
+           Post.objects.create(user = user, 
+                               content = content,
+                                image = image)
+       return redirect("index")
+
+    return render(request, "index.html",{"post":post})
