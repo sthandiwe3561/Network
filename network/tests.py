@@ -102,6 +102,32 @@ class PostModelTest(TestCase):
         self.assertEqual(self.post.content, "God is all I have")
         self.assertTrue(self.post.image.name.startswith('posts/test_image'))
 
+class PostViewTest(TestCase):
+    def setUp(self):
+         #for making HTTP request to stimulate web user testing functions
+         self.client = Client()
+         User = get_user_model()
+         self.user = User.objects.create_user(username="sthandiwe", password="password123")
+         self.client.login(username="sthandiwe", password="password123")
+         self.post = Post.objects.create(user=self.user, content="Test Content")
+
+    def test_create_post_get_request(self):
+        """Test that the create post page returns a 200 status code."""
+        response = self.client.get(reverse("create_post"))  # Assuming your URL name is 'create_post'
+        self.assertEqual(response.status_code, 200)  # Check if GET request works
+
+    def test_edit_post_get_request(self):
+        """Test that the edit post page returns a 200 status code."""
+        response = self.client.get(reverse("edit_post", args=[self.post.id]))  # Assuming 'edit_post' needs post_id
+        self.assertEqual(response.status_code, 200)  # Check if GET request works
+
+
+
+        
+
+        
+
+
 
 
 

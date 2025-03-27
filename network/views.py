@@ -116,4 +116,4 @@ def create_or_edit_post(request, post_id=None):
                                 image = image)
        return redirect("index")
 
-    return render(request, "index.html",{"post":post})
+    return render(request, "network/index.html",{"post":post})
