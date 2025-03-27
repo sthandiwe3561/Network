@@ -121,6 +121,60 @@ class PostViewTest(TestCase):
         response = self.client.get(reverse("edit_post", args=[self.post.id]))  # Assuming 'edit_post' needs post_id
         self.assertEqual(response.status_code, 200)  # Check if GET request works
 
+    def test_create_post_with_image(self):
+        """Test creating a post with an image."""
+        image = SimpleUploadedFile("test_image.jpg", b"image_content", content_type="image/jpeg")
+        response = self.client.post(reverse("create_post"), {
+            "content": "Test content with an image",
+            "image": image
+        })
+        
+        # Check if the post was created and redirected
+        self.assertEqual(response.status_code, 302)  # Redirected to "index"
+        self.assertEqual(Post.objects.count(), 2)  # One post created
+        new_post = Post.objects.last()
+        self.assertEqual(new_post.content, "Test content with an image")
+        self.assertIsNotNone(new_post.image)  # Ensure image is uploaded
+
+    def test_create_post_without_image(self):
+        """Test creating a post without an image."""
+        response = self.client.post(reverse("create_post"), {
+            "content": "Test content without an image",
+        })
+        
+        # Check if the post was created and redirected
+        self.assertEqual(response.status_code, 302)  # Redirected to "index"
+        self.assertEqual(Post.objects.count(), 2)  # One post created
+        new_post = Post.objects.last()
+        self.assertEqual(new_post.content, "Test content without an image")
+        self.assertEqual(new_post.image.name,'')  # Ensure no image is uploaded
+
+    def test_edit_post_with_image(self):
+        """Test editing a post with an image."""
+        image = SimpleUploadedFile("new_image.jpg", b"new_image_content", content_type="image/jpeg")
+        response = self.client.post(reverse("edit_post", args=[self.post.id]), {
+            "content": "Updated content with an image",
+            "image": image
+        })
+        
+        # Check if the post was updated and redirected
+        self.assertEqual(response.status_code, 302)  # Redirected to "index"
+        self.post.refresh_from_db()  # Refresh the post instance
+        self.assertEqual(self.post.content, "Updated content with an image")
+        self.assertIsNotNone(self.post.image)  # Ensure image is updated
+
+    def test_edit_post_without_image(self):
+        """Test editing a post without an image."""
+        response = self.client.post(reverse("edit_post", args=[self.post.id]), {
+            "content": "Updated content without an image",
+        })
+        
+        # Check if the post was updated and redirected
+        self.assertEqual(response.status_code, 302)  # Redirected to "index"
+        self.post.refresh_from_db()  # Refresh the post instance
+        self.assertEqual(self.post.content, "Updated content without an image")
+        self.assertEqual(self.post.image.name,'')  # Ensure no image is updated
+
 
 
         
