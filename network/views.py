@@ -117,3 +117,9 @@ def create_or_edit_post(request, post_id=None):
        return redirect("index")
 
     return render(request, "network/index.html",{"post":post})
+
+def post_all_display(request):
+    #fetch all post from Post model
+    posts =Post.objects.all()
+    return render(request,"network/index.html",{"posts":posts})
+
