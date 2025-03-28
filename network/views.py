@@ -9,7 +9,9 @@ from .models import User,Profile,Post
 
 
 def index(request):
-    return render(request, "network/index.html")
+    posts =Post.objects.all()
+
+    return render(request, "network/index.html",{"posts":posts})
 
 
 def login_view(request):
@@ -87,6 +89,8 @@ def profile(request):
     
     return render(request,"network/create_profile.html")
 
+
+@login_required  # Ensures only logged-in users can access this view
 def create_or_edit_post(request, post_id=None):
 
     #fecthing the users id 
@@ -104,6 +108,8 @@ def create_or_edit_post(request, post_id=None):
        #fetching data form the form
        content = request.POST.get("content")
        image = request.FILES.get("image")
+       posts =Post.objects.all()
+
     
        if post:
           post.content = content
@@ -117,9 +123,4 @@ def create_or_edit_post(request, post_id=None):
        return redirect("index")
 
     return render(request, "network/index.html",{"post":post})
-
-def post_all_display(request):
-    #fetch all post from Post model
-    posts =Post.objects.all()
-    return render(request,"network/index.html",{"posts":posts})
 

@@ -1,33 +1,79 @@
 {% extends "network/layout.html" %} {% block body %}
-<div class="form-container">
-  <h3>Create Post</h3>
-  <form
-    action="{% if post %}{% url 'edit_post' post.id %}{% else %}{% url 'create_post' %}{% endif %}"
-    method="post"
-    enctype="multipart/form-data"
-  >
-    {% csrf_token %}
+<div id="all">
+  {% if user.is_authenticated %}
+  <div class="form-container">
+    <h3>Create Post</h3>
+    <form
+      action="{% if post %}{% url 'edit_post' post.id %}{% else %}{% url 'create_post' %}{% endif %}"
+      method="post"
+      enctype="multipart/form-data"
+    >
+      {% csrf_token %}
 
-    <div class="form-group">
-      <textarea
-        id="contant"
-        name="content"
-        class="form-control"
-        placeholder="What's on your mind?"
-        rows="3"
-        required
-      >
+      <div class="form-group">
+        <textarea
+          id="contant"
+          name="content"
+          class="form-control"
+          placeholder="What's on your mind?"
+          rows="3"
+          required
+        >
 {{post.content | default:''}}</textarea
-      >
-    </div>
-    <div class="form-group mt-2">
-      <label for="image">Upload an image (optional):</label>
-      <input type="file" id="image" name="image" class="form-control-file" />
-    </div>
+        >
+      </div>
+      <div class="form-group mt-2">
+        <label for="image">Upload an image (optional):</label>
+        <input type="file" id="image" name="image" class="form-control-file" />
+      </div>
 
-    <button type="submit">{% if post %}Edit{% else %}Post{% endif %}</button>
-  </form>
+      <button type="submit">{% if post %}Edit{% else %}Post{% endif %}</button>
+    </form>
+  </div>
+  {% endif %}
+  <h1>All Post</h1>
+  <div id="postList">
+    {% if posts %} {% for post in posts %}
+    <div class="post-container">
+      <div class="post-header">
+        <div class="user-info">
+          <img
+            src="{{post.user.Profile_user.image.url}}"
+            alt="Profile Picture"
+            class="profile_img"
+          />
+          <span class="user-name">{{post.user.username}}</span>
+        </div>
+        {% if post.user != user %}
+        <button class="follow-btn">Follow</button>
+        {% endif %}
+        <div class="post-options">
+          <button class="options-btn">⋮</button>
+          <div class="dropdown-menu">
+            <ul>
+              {% if user %}
+              <li><a href="#">Edit</a></li>
+              <li><a href="#">Delete</a></li>
+              {% endif %}
+              <li><a href="#">Hide</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="post-content">{{post.content}}</div>
+      {% if post.image %}
+      <div class="post-image">
+        <img src="{{post.image.url}}" alt="Post Image" />
+      </div>
+      {% endif %}
+      <div class="post-action">
+        <button class="like-btn"><span class="like-count"></span> likes</button>
+        <span class="comment"><a href="#">Comments</a></span>
+      </div>
+    </div>
+    {% endfor %} {% else %}
+    <p>No Posts available</p>
+    {% endif %}
+  </div>
 </div>
-<h1>All Post</h1>
-<div id="postList"></div>
 {% endblock %}
