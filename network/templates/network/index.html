@@ -37,11 +37,13 @@
     <div class="post-container">
       <div class="post-header">
         <div class="user-info">
-          <img
-            src="{{post.user.Profile_user.image.url}}"
-            alt="Profile Picture"
-            class="profile_img"
-          />
+          <a href="#">
+            <img
+              src="{{post.user.Profile_user.image.url}}"
+              alt="Profile Picture"
+              class="profile_img"
+            />
+          </a>
           <span class="user-name">{{post.user.username}}</span>
         </div>
         {% if post.user != user %}
@@ -52,14 +54,15 @@
           <div class="dropdown-menu">
             <ul>
               {% if user %}
-              <li><a href="#">Edit</a></li>
-              <li><a href="#">Delete</a></li>
+              <li><a href="{% url 'edit_post' post.id %}">Edit</a></li>
+              <li><a href="{% url 'delete' post.id %}">Delete</a></li>
               {% endif %}
               <li><a href="#">Hide</a></li>
             </ul>
           </div>
         </div>
       </div>
+      <div class="date">{{post.created_at}}</div>
       <div class="post-content">{{post.content}}</div>
       {% if post.image %}
       <div class="post-image">

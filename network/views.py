@@ -95,6 +95,10 @@ def create_or_edit_post(request, post_id=None):
 
     #fecthing the users id 
     user = request.user
+
+    #fetching all post
+    posts =Post.objects.all()
+
     
     if post_id:
         post = get_object_or_404(Post, id=post_id)
@@ -122,5 +126,18 @@ def create_or_edit_post(request, post_id=None):
                                 image = image)
        return redirect("index")
 
-    return render(request, "network/index.html",{"post":post})
+    return render(request, "network/index.html",{"post":post, "posts":posts})
+
+def delete(request,post_id):
+     #fecthing the users id 
+    user = request.user
+    
+    
+    post = get_object_or_404(Post, id=post_id)
+
+    if post.user != user:
+        return redirect("error_page")
+    
+    post.delete()
+    return redirect("index")
 

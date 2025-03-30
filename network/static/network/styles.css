@@ -104,6 +104,10 @@
   margin-top: 10px;
 }
 
+.date {
+  margin-bottom: 30px;
+}
+
 .like-btn {
   background: transparent;
   border: none;
