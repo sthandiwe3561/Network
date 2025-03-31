@@ -178,9 +178,10 @@ def like_button(request,post_id):
         return redirect(reverse('index') + f'?post_id={post.id}')
 
 def profile_display(request,user_id):
-    profile  = Profile.objects.filter(user=user_id)
-    error = "Profile not available"
+    profile  = Profile.objects.filter(user=user_id).first()
 
     if profile:
         return render(request,"network/profile.html", {"profile":profile})
+    
+    error = "Profile not available"
     return render(request,"network/profile.html",{"error":error})
