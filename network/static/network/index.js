@@ -22,4 +22,15 @@ document.addEventListener("DOMContentLoaded", function () {
   dropdown.forEach((dropdowns) => {
     dropdowns.addEventListener("click", dropDown);
   });
+
+  //getting post id so when user like it returns to the liked post
+  const urlParams = new URLSearchParams(window.location.search);
+  const postId = urlParams.get("post_id");
+
+  if (postId) {
+    const postElement = document.getElementById(`post-${postId}`);
+    if (postElement) {
+      postElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
 });

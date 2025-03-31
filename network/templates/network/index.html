@@ -34,7 +34,7 @@
   <h1>All Post</h1>
   <div id="postList">
     {% if posts %} {% for post in posts %}
-    <div class="post-container">
+    <div class="post-container" id="post-{{post.id}}">
       <div class="post-header">
         <div class="user-info">
           <a href="#">
@@ -70,7 +70,10 @@
       </div>
       {% endif %}
       <div class="post-action">
-        <button class="like-btn"><span class="like-count"></span> likes</button>
+        <span class="like-count">{{ post.like_count }}</span>
+        <a class="like-btn" href="{% url 'like' post.id %}">
+          like{{post.like_count|pluralize }}
+        </a>
         <span class="comment"><a href="#">Comments</a></span>
       </div>
     </div>

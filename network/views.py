@@ -2,23 +2,41 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
 from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse
+from django.db.models import Count
+
 
 from .models import User,Profile,Post
 
 
+
+def get_posts(post_id=None, page_number=1, posts_per_page=10):
+    """
+    Fetches posts.
+    If post_id is provided, fetches a specific post.
+    If post_id is not provided, fetches all posts with pagination.
+    """
+    if post_id:
+        # Fetch a specific post by ID
+        return get_object_or_404(Post, id=post_id)
+    else:
+        # Fetch all posts with like_count annotation
+        posts = Post.objects.annotate(like_count=Count('likes')).order_by('-created_at')
+        
+        # Paginate posts
+        paginator = Paginator(posts, posts_per_page)
+        page_obj = paginator.get_page(page_number)  # Get the requested page
+                
+        return page_obj
+
+
 def index(request):
-    posts =Post.objects.all().order_by('-created_at')
     page_number = request.GET.get('page', 1)  # Get page number from query param
-    paginator = Paginator(posts, 10)  # 10 posts per page
+    post = get_posts(page_number=page_number)
 
-    page_obj = paginator.get_page(page_number)  # Get the requested page
-
-
-
-    return render(request, "network/index.html",{"posts":page_obj})
+    return render(request, "network/index.html",{"posts":post})
 
 
 def login_view(request):
@@ -104,8 +122,8 @@ def create_or_edit_post(request, post_id=None):
     user = request.user
 
     #fetching all post
-    posts =Post.objects.all()
-
+    page_number = request.GET.get('page', 1)  # Get page number from query param
+    posts = get_posts(page_number=page_number)
     
     if post_id:
         post = get_object_or_404(Post, id=post_id)
@@ -148,3 +166,13 @@ def delete(request,post_id):
     post.delete()
     return redirect("index")
 
+def like_button(request,post_id):
+    user = request.user
+    post = get_object_or_404(Post, id=post_id)
+
+    if post:
+        if user in post.likes.all():  # If the user already liked the post, unlike it
+           post.likes.remove(user)
+        else:  # Otherwise, like it
+           post.likes.add(user)
+        return redirect(reverse('index') + f'?post_id={post.id}')
