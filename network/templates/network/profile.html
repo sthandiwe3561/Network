@@ -1,0 +1,15 @@
+{% extends 'network/layout.html' %} {% block body %} {% if profile %}
+<div class="profile_section">
+  <img src="{{profile.image.url}}" alt="Profile Picture" class="profile2_img" />
+  <div class="section2">
+    <h1>{{profile.profile_user.username}}</h1>
+    <div class="following">
+      <span><a href="#" id="following_count">Following</a></span>
+      <span><a href="#" id="followers_count">Followers</a></span>
+    </div>
+    <p>{{profile.bio}}</p>
+  </div>
+</div>
+{% else %}
+<p>No profile</p>
+{% endif %} {% endblock %}
