@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -9,9 +10,15 @@ from .models import User,Profile,Post
 
 
 def index(request):
-    posts =Post.objects.all()
+    posts =Post.objects.all().order_by('-created_at')
+    page_number = request.GET.get('page', 1)  # Get page number from query param
+    paginator = Paginator(posts, 10)  # 10 posts per page
 
-    return render(request, "network/index.html",{"posts":posts})
+    page_obj = paginator.get_page(page_number)  # Get the requested page
+
+
+
+    return render(request, "network/index.html",{"posts":page_obj})
 
 
 def login_view(request):
