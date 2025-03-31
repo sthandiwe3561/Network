@@ -12,24 +12,25 @@ from .models import User,Profile,Post
 
 
 
-def get_posts(post_id=None, page_number=1, posts_per_page=10):
+def get_posts(user_id=None, page_number=1, posts_per_page=10):
     """
     Fetches posts.
     If post_id is provided, fetches a specific post.
     If post_id is not provided, fetches all posts with pagination.
     """
-    if post_id:
+    if user_id:
         # Fetch a specific post by ID
-        return get_object_or_404(Post, id=post_id)
+         # Fetch all posts by the given user, ordered by latest
+        posts = Post.objects.filter(user=user_id).annotate(like_count=Count('likes')).order_by('-created_at')
     else:
         # Fetch all posts with like_count annotation
         posts = Post.objects.annotate(like_count=Count('likes')).order_by('-created_at')
         
-        # Paginate posts
-        paginator = Paginator(posts, posts_per_page)
-        page_obj = paginator.get_page(page_number)  # Get the requested page
+    # Paginate posts
+    paginator = Paginator(posts, posts_per_page)
+    page_obj = paginator.get_page(page_number)  # Get the requested page
                 
-        return page_obj
+    return page_obj
 
 
 def index(request):
@@ -180,8 +181,12 @@ def like_button(request,post_id):
 def profile_display(request,user_id):
     profile  = Profile.objects.filter(user=user_id).first()
 
+    #fetching user_id post
+    page_number = request.GET.get('page', 1)  # Get page number from query param
+    posts = get_posts(user_id=user_id, page_number=page_number)
+
     if profile:
-        return render(request,"network/profile.html", {"profile":profile})
+        return render(request,"network/profile.html", {"profile":profile, "posts":posts})
     
     error = "Profile not available"
     return render(request,"network/profile.html",{"error":error})

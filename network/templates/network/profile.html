@@ -1,15 +1,110 @@
 {% extends 'network/layout.html' %} {% block body %} {% if profile %}
-<div class="profile_section">
-  <img src="{{profile.image.url}}" alt="Profile Picture" class="profile2_img" />
-  <div class="section2">
-    <h1>{{profile.profile_user.username}}</h1>
-    <div class="following">
-      <span><a href="#" id="following_count">Following</a></span>
-      <span><a href="#" id="followers_count">Followers</a></span>
+<div class="profile">
+  <div class="profile_section">
+    <img
+      src="{{profile.image.url}}"
+      alt="Profile Picture"
+      class="profile2_img"
+    />
+    <div class="section2">
+      <h2>{{profile.user.username}}</h2>
+      <div class="following">
+        <span><a href="#" id="following_count">Following</a></span>
+        <span><a href="#" id="followers_count">Followers</a></span>
+      </div>
+      <p>{{profile.bio}}</p>
     </div>
-    <p>{{profile.bio}}</p>
   </div>
+
+  <h1>All Post</h1>
+  <div id="postList">
+    {% if posts %} {% for post in posts %}
+    <div class="post-container" id="post-{{post.id}}">
+      <div class="post-header">
+        <div class="user-info">
+          <a href="#">
+            <img
+              src="{{post.user.Profile_user.image.url}}"
+              alt="Profile Picture"
+              class="profile_img"
+            />
+          </a>
+          <span class="user-name">{{post.user.username}}</span>
+        </div>
+        {% if post.user != user %}
+        <button class="follow-btn">Follow</button>
+        {% endif %}
+        <div class="post-options">
+          <button class="options-btn">⋮</button>
+          <div class="dropdown-menu">
+            <ul>
+              {% if user %}
+              <li><a href="{% url 'edit_post' post.id %}">Edit</a></li>
+              <li><a href="{% url 'delete' post.id %}">Delete</a></li>
+              {% endif %}
+              <li><a href="#">Hide</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="date">{{post.created_at}}</div>
+      <div class="post-content">{{post.content}}</div>
+      {% if post.image %}
+      <div class="post-image">
+        <img src="{{post.image.url}}" alt="Post Image" />
+      </div>
+      {% endif %}
+      <div class="post-action">
+        <span class="like-count">{{ post.like_count }}</span>
+        <a class="like-btn" href="{% url 'like' post.id %}">
+          like{{post.like_count|pluralize }}
+        </a>
+        <span class="comment"><a href="#">Comments</a></span>
+      </div>
+    </div>
+    {% endfor %} {% else %}
+    <p>No Posts available</p>
+    {% endif %}
+    <!-- Pagination Controls -->
+    <div class="pagination-container">
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          {% if posts.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1">First</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ posts.previous_page_number }}"
+              >Previous</a
+            >
+          </li>
+          {% endif %}
+
+          <li class="page-item disabled">
+            <span class="page-link"
+              >Page {{ posts.number }} of {{ posts.paginator.num_pages }}</span
+            >
+          </li>
+
+          {% if posts.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ posts.next_page_number }}"
+              >Next</a
+            >
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ posts.paginator.num_pages }}"
+              >Last</a
+            >
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+
+    {% else %}
+    <p>No profile</p>
+    {% endif %}
+  </div>
+  {% endblock %}
 </div>
-{% else %}
-<p>No profile</p>
-{% endif %} {% endblock %}
