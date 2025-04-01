@@ -71,7 +71,10 @@
       {% endif %}
       <div class="post-action">
         <span class="like-count">{{ post.like_count }}</span>
-        <a class="like-btn" href="{% url 'like' post.id %}">
+        <a
+          class="like-btn"
+          href="{% url 'like' post.id %}?redirect_to={{ request.resolver_match.url_name }}"
+        >
           like{{post.like_count|pluralize }}
         </a>
         <span class="comment"><a href="#">Comments</a></span>

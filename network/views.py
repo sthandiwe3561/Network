@@ -176,7 +176,15 @@ def like_button(request,post_id):
            post.likes.remove(user)
         else:  # Otherwise, like it
            post.likes.add(user)
-        return redirect(reverse('index') + f'?post_id={post.id}')
+           
+     # Get redirect target (from query parameter)
+    redirect_to = request.GET.get('redirect_to', 'index')  # Default to 'index' if not provided
+
+    # If liking from profile page, include user ID in redirect
+    if redirect_to == "profile_display":
+        return redirect(reverse(redirect_to, args=[post.user.id]) + f'?post_id={post.id}')
+    
+    return redirect(reverse(redirect_to) + f'?post_id={post.id}')
 
 def profile_display(request,user_id):
     profile  = Profile.objects.filter(user=user_id).first()
