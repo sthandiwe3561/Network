@@ -4,17 +4,18 @@ document.addEventListener("DOMContentLoaded", function () {
   const dropMenu = document.querySelectorAll(".dropdown-menu");
 
   function dropDown(event) {
-    dropMenu.forEach((dropMenus) => {
-      dropMenus.style.display = "none";
-    });
     // Get the corresponding dropdown menu for the clicked button
     const clickedMenu = event.target.nextElementSibling;
+    const isAlreadyVisible = clickedMenu.style.display === "block";
 
-    // Toggle the visibility of the clicked menu
-    if (clickedMenu.style.display === "block") {
-      clickedMenu.style.display = "none"; // Hide if already visible
-    } else {
-      clickedMenu.style.display = "block"; // Show if hidden
+    // Hide all dropdown menus
+    dropMenu.forEach((menu) => {
+      menu.style.display = "none";
+    });
+
+    // Show the clicked one only if it was not already visible
+    if (!isAlreadyVisible) {
+      clickedMenu.style.display = "block";
     }
   }
 

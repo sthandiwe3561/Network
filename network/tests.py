@@ -2,7 +2,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
-from network.models import Profile,Post
+from network.models import Profile,Post,Follow
 import io
 from PIL import Image
 
@@ -176,7 +176,21 @@ class PostViewTest(TestCase):
         self.assertEqual(self.post.image.name,'')  # Ensure no image is updated
 
 
+class followModelTest(TestCase):
 
+    def setUp(self):
+         User = get_user_model()
+         self.user1 = User.objects.create_user(username="sthandiwe", password="password123")
+         self.user2 = User.objects.create_user(username="user", password="password12")
+
+    def test_follow_creation(self):
+        """Test if a user can successfully follow another user."""
+        follow = Follow.objects.create(follower=self.user1, following=self.user2)
+        self.assertEqual(follow.follower, self.user1)
+        self.assertEqual(follow.following, self.user2)
+        self.assertFalse(follow.follow_status)  # Default should be False
+
+        
         
 
         
