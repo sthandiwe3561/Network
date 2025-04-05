@@ -44,11 +44,11 @@
               class="profile_img"
             />
           </a>
-          <span class="user-name">{{post.user.username}}</span>
+          <span class="user-name">{{post.user.username|capfirst}}</span>
         </div>
-        {% if post.user != user %}
+        {% if user.is_authenticated %} {% if post.user != user %}
         <button class="follow-btn">Follow</button>
-        {% endif %}
+        {% endif %} {% endif %}
         <div class="post-options">
           <button class="options-btn">⋮</button>
           <div class="dropdown-menu">
@@ -63,7 +63,7 @@
         </div>
       </div>
       <div class="date">{{post.created_at}}</div>
-      <div class="post-content">{{post.content}}</div>
+      <div class="post-content">{{post.content|capfirst}}</div>
       {% if post.image %}
       <div class="post-image">
         <img src="{{post.image.url}}" alt="Post Image" />

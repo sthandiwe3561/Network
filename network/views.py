@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -170,6 +171,11 @@ def delete(request,post_id):
 def like_button(request,post_id):
     user = request.user
     post = get_object_or_404(Post, id=post_id)
+
+    # 🚫 Check if user is not authenticated
+    if not user.is_authenticated:
+        messages.error(request, "You must be logged in to like a post.")
+        return redirect('login') 
 
     if post:
         if user in post.likes.all():  # If the user already liked the post, unlike it
