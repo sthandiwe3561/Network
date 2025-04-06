@@ -10,6 +10,8 @@
       integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
       crossorigin="anonymous"
     />
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
     <link href="{% static 'network/styles.css' %}" rel="stylesheet" />
   </head>
   <body>
@@ -18,13 +20,7 @@
 
       <div>
         <ul class="navbar-nav mr-auto">
-          {% if user.is_authenticated %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'profile_display' user.id %}"
-              ><strong>{{ user.username }}</strong></a
-            >
-          </li>
-          {% endif %}
+          {% if user.is_authenticated %} {% endif %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'index' %}">All Posts</a>
           </li>
@@ -33,7 +29,16 @@
             <a class="nav-link" href="#">Following</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+            <a class="nav-link logout" href="{% url 'logout' %}">Log Out</a>
+          </li>
+          <li>
+            <a href="{% url 'profile_display' user.id %}">
+              <img
+                src="{{user.Profile_user.image.url}}"
+                alt="Profile Picture"
+                class="profile_img"
+              />
+            </a>
           </li>
           {% else %}
           <li class="nav-item">
@@ -63,5 +68,11 @@
 
     <div class="body">{% block body %} {% endblock %}</div>
     <script src="{% static 'network/index.js' %}"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+      AOS.init({
+        duration: 2000,
+      });
+    </script>
   </body>
 </html>

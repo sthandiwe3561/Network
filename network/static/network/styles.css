@@ -363,3 +363,44 @@
   max-width: 600px;
   line-height: 1.6;
 }
+
+/*navbar*/
+.logout {
+  margin-right: 15px;
+}
+
+/*login*/
+
+.login {
+  margin-top: 10%;
+  padding: 20px 120px;
+}
+.login h2 {
+  font-size: 40px;
+  margin-bottom: 30px;
+  margin-top: 120px;
+  text-align: center;
+}
+.login input {
+  display: block;
+  margin: 0 auto;
+  width: 50%;
+}
+.form_link {
+  font-size: 20px;
+  margin-top: 20px;
+  text-align: center;
+}
+.bodyy {
+  background: #555;
+  height: 72vh;
+  border-top-left-radius: 60%;
+  border-top-right-radius: 60%;
+}
+.form-control {
+  border-radius: 30px;
+}
+.btn-login {
+  background: black;
+  color: #fff;
+}
