@@ -1,5 +1,6 @@
 
-from django.urls import path
+from django.urls import path,include
+from rest_framework.routers import DefaultRouter
 
 from . import views
 
@@ -16,3 +17,11 @@ urlpatterns = [
     path("profile_display/<int:user_id>", views.profile_display, name="profile_display")
 
 ]
+
+router = DefaultRouter()
+router.register('follow',views.FollowViewSet, basename="follow")
+
+urlpatterns += [
+        path("", include(router.urls)),
+]
+

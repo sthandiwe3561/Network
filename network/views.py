@@ -3,13 +3,15 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse
 from django.db.models import Count
+from rest_framework import viewsets
 
+from .models import User,Profile,Post,Follow
+from .serializer import FollowSerializer
 
-from .models import User,Profile,Post
 
 
 
@@ -204,3 +206,7 @@ def profile_display(request,user_id):
     
     error = "Profile not available"
     return render(request,"network/profile.html",{"error":error})
+
+class FollowViewSet(viewsets.ModelViewSet):
+    queryset = Follow.objects.all()
+    serializer_class = FollowSerializer
