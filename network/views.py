@@ -8,6 +8,8 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse
 from django.db.models import Count
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from .models import User,Profile,Post,Follow
 from .serializer import FollowSerializer
@@ -210,3 +212,22 @@ def profile_display(request,user_id):
 class FollowViewSet(viewsets.ModelViewSet):
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer
+
+    #to check the follow status
+    # Custom action to check follow status between current user and the user of the post
+    @action(detail=True, methods=['get'], url_path='follow-status')
+    def follow_status(request,self,pk=None):
+        #using the sent id to get post user id
+        post = post.self.object()
+
+        # Get the current user and the user of the post
+        follower_id = request.user.id
+        following_id = post.user.id
+
+        #getting folow_status response to frontend
+        try:
+            follow = Follow.objects.get(follower_id=follower_id, following_id=following_id)
+            return Response({"follow_status": follow.follow_status})
+        except Follow.DoesNotExist:
+            return Response({"follow_status": False})
+

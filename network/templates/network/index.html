@@ -47,7 +47,7 @@
           <span class="user-name">{{post.user.username|capfirst}}</span>
         </div>
         {% if user.is_authenticated %} {% if post.user != user %}
-        <button class="follow-btn">Follow</button>
+        <button class="follow-btn" data-user-id="{post.user.id}">Follow</button>
         {% endif %} {% endif %}
         <div class="post-options">
           <button class="options-btn">⋮</button>

@@ -67,6 +67,9 @@
     {% endfor %} {% endif %}
 
     <div class="body">{% block body %} {% endblock %}</div>
+    <script>
+      const currentUserId = "{{ request.user.id }}";
+    </script>
     <script src="{% static 'network/index.js' %}"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
