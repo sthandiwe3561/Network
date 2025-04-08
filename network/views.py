@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render,redirect,get_object_or_404
 from django.urls import reverse
 from django.db.models import Count
-from rest_framework import viewsets
+from rest_framework import viewsets , status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -215,19 +215,37 @@ class FollowViewSet(viewsets.ModelViewSet):
 
     #to check the follow status
     # Custom action to check follow status between current user and the user of the post
-    @action(detail=True, methods=['get'], url_path='follow-status')
-    def follow_status(request,self,pk=None):
-        #using the sent id to get post user id
-        post = post.self.object()
+  # Custom action to check follow status
+    @action(detail=False, methods=["GET"], url_path="follow-status/(?P<follower_id>[^/.]+)/(?P<following_id>[^/.]+)")
+    def follow_status(self, request, follower_id, following_id):
+        """Check if the logged-in user is following another user."""
+        is_following = bool(Follow.objects.filter(follower=follower_id, following=following_id).exists())
+        return Response({"follow_status": is_following}, status=status.HTTP_200_OK)
+    
+      #create a create function for follow model validations
+    def perform_create(self, serializer):
+        #get data for follower and following
+        follower = self.request.data.get("follower")
+        following = self.request.data.get("following")
 
-        # Get the current user and the user of the post
-        follower_id = request.user.id
-        following_id = post.user.id
-
-        #getting folow_status response to frontend
-        try:
-            follow = Follow.objects.get(follower_id=follower_id, following_id=following_id)
-            return Response({"follow_status": follow.follow_status})
-        except Follow.DoesNotExist:
-            return Response({"follow_status": False})
+        #make sure thatthe user is not following themselves
+        if follower == following:
+            return Response({"error": "Can not follow your self"}, status= status.HTTP_406_NOT_ACCEPTABLE)
+        
+        # make suer the are no duplicate
+        if Follow.objects.filter(follower=follower, following=following).exists():
+            return Response({"error":"You already follow this user"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer.save(follower_id=follower, following_id=following)
+    
+    @action(detail=False, methods=["DELETE"], url_path="unfollow/(?P<follower_id>[^/.]+)/(?P<following_id>[^/.]+)")
+    def unfollow(self, request, follower_id=None, following_id=None):
+          """Delete a follow relationship"""
+          try:
+             follow_instance = Follow.objects.get(follower_id=follower_id, following_id=following_id)
+             follow_instance.delete()
+             return Response({"message": "Unfollowed successfully"}, status=status.HTTP_204_NO_CONTENT)
+          except Follow.DoesNotExist:
+              return Response({"error": "Follow relationship not found"}, status=status.HTTP_404_NOT_FOUND)
+    
 
