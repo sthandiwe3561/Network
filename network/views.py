@@ -209,6 +209,16 @@ def profile_display(request,user_id):
     error = "Profile not available"
     return render(request,"network/profile.html",{"error":error})
 
+def Follower_display(request):
+    #Get users id
+    user = request.user
+    #fetch data from follow model
+    followed_users = Follow.objects.filter(follower=user, follow_status=True)
+    return render(request,"'network/follow.html",{"following":followed_users})
+
+
+    pas
+
 class FollowViewSet(viewsets.ModelViewSet):
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer

@@ -47,7 +47,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   //fetching the follow_status from backend to change the inner text of te follow button
-
   document.querySelectorAll(".follow-btn").forEach((button) => {
     const userId = button.dataset.userId;
 

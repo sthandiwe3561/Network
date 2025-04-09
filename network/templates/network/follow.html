@@ -1,0 +1,14 @@
+{% extends "network/layout.html" %} {% block body %}
+<div class="followers">
+  {% if following %} {% for follow in following %}
+  <a href="#">
+    <img
+      src="{{follow.user.Profile_user.image.url}}"
+      alt="Profile Picture"
+      class="profile_img"
+    />
+  </a>
+  {% endfor %}
+</div>
+<div class="followers_post"></div>
+{% endblock %}
