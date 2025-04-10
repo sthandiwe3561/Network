@@ -24,9 +24,12 @@ def get_posts(user_id=None, page_number=1, posts_per_page=10):
     If post_id is not provided, fetches all posts with pagination.
     """
     if user_id:
-        # Fetch a specific post by ID
-         # Fetch all posts by the given user, ordered by latest
-        posts = Post.objects.filter(user=user_id).annotate(like_count=Count('likes')).order_by('-created_at')
+         if isinstance(user_id, list):
+            # When filtering multiple users (e.g. followers)
+            posts = Post.objects.filter(user__id__in=user_id).annotate(like_count=Count('likes')).order_by('-created_at')
+         else:
+            # Filtering posts from a single user
+            posts = Post.objects.filter(user=user_id).annotate(like_count=Count('likes')).order_by('-created_at')
     else:
         # Fetch all posts with like_count annotation
         posts = Post.objects.annotate(like_count=Count('likes')).order_by('-created_at')
@@ -214,10 +217,19 @@ def Follower_display(request):
     user = request.user
     #fetch data from follow model
     followed_users = Follow.objects.filter(follower=user, follow_status=True)
-    return render(request,"'network/follow.html",{"following":followed_users})
+
+    # Extract the user IDs of the users being followed
+    following_user_ids = [follow.following.id for follow in followed_users]
+    
+
+    #fetching post of followers
+    page_number = request.GET.get('page', 1)  # Get page number from query param
+    posts = get_posts(user_id=following_user_ids, page_number=page_number)
+
+    return render(request,"network/follow.html",{"following":followed_users, "posts":posts})
 
 
-    pas
+    
 
 class FollowViewSet(viewsets.ModelViewSet):
     queryset = Follow.objects.all()

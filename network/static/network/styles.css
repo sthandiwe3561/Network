@@ -404,3 +404,25 @@
   background: black;
   color: #fff;
 }
+
+/*follow*/
+.followed-users-container {
+  margin-left: 20px;
+  display: flex; /* Arrange items in a row */
+  overflow-x: auto; /* Allow horizontal scrolling */
+  padding: 10px 0; /* Optional, for some spacing */
+  gap: 15px; /* Optional, space between images */
+}
+
+.followed-users-container img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.followers h1 {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+}
