@@ -22,7 +22,7 @@
       <div class="post-container" id="post-{{post.id}}">
         <div class="post-header">
           <div class="user-info">
-            <a href="#">
+            <a href="{% url 'profile_display' post.user.id %}">
               <img
                 src="{{post.user.Profile_user.image.url}}"
                 alt="Profile Picture"
@@ -66,6 +66,54 @@
           </a>
           <span class="comment"><a href="#">Comments</a></span>
         </div>
+          <!-- Comment Form (Visible only for logged-in users) -->
+      {% if user.is_authenticated %}
+      <div class="comment-section">
+        <form method="POST" action="{% url 'comment' post.id %}?redirect_to={{ request.resolver_match.url_name }}" class="comment-form">
+          {% csrf_token %}
+          <textarea
+            name="content"
+            rows="2"
+            placeholder="Add a comment..."
+            required
+            class="comment-textarea"
+          ></textarea>
+              <div class="submit-wrapper">
+          <button type="submit" class="comment-button">Comment</button>
+              </div>
+        </form>
+      </div>
+        {% endif %}
+ <div class="comments">
+  {% for comment in post.comment_post.all %}
+    <div class="single-comment">
+      <!-- Header: profile image + username -->
+      <div class="comment-header">
+        <img
+          src="{{ comment.user.Profile_user.image.url }}"
+          alt="Profile Picture"
+          class="comment-img"
+        />
+        <strong class="comment-username">{{ comment.user.username|capfirst }}</strong>
+        <span>{{comment.created_at}}</span>
+      </div>
+
+      <!-- Content -->
+      <p class="comment-content">{{ comment.content }}</p>
+
+      <!-- Actions (Only for owner) -->
+      {% if comment.user == user %}
+        <div class="comment-actions">
+          <a href="#" class="comment-edit-btn">Edit</a>
+          <a href="#" class="comment-delete-btn">Delete</a>
+        </div>
+      {% endif %}
+    </div>
+  {% empty %}
+    <p class="no-comment">No comments yet.</p>
+  {% endfor %}
+</div>
+      </div>
       </div>
       {% endfor %} {% else %}
       <p>No Posts available</p>
@@ -87,8 +135,7 @@
 
             <li class="page-item disabled">
               <span class="page-link"
-                >Page {{ posts.number }} of {{ posts.paginator.num_pages
-                }}</span
+                >Page {{ posts.number }} of {{ posts.paginator.num_pages}}</span
               >
             </li>
 

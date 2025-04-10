@@ -227,6 +227,57 @@
   background-color: #0056b3;
 }
 
+/*displayed comments*/
+.comments {
+  margin-top: 1rem;
+}
+
+.single-comment {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0.75rem 0;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.comment-img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.comment-username {
+  font-weight: 600;
+  color: #333;
+}
+
+.comment-content {
+  margin: 0.5rem 0 0.5rem 2.2rem; /* align with username */
+  color: #444;
+}
+
+.comment-actions {
+  margin-left: 2.2rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.comment-edit-btn,
+.comment-delete-btn {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.comment-edit-btn:hover,
+.comment-delete-btn:hover {
+  text-decoration: underline;
+}
+
 /*post form*/
 /* Form Container */
 .form-container {

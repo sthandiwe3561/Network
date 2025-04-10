@@ -11,7 +11,7 @@ from rest_framework import viewsets , status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .models import User,Profile,Post,Follow
+from .models import User,Profile,Post,Follow,Comment
 from .serializer import FollowSerializer
 
 
@@ -271,6 +271,24 @@ class FollowViewSet(viewsets.ModelViewSet):
               return Response({"error": "Follow relationship not found"}, status=status.HTTP_404_NOT_FOUND)
 
 @login_required  # Ensures only logged-in users can access this view
-def create_or_edit_post(request, post_id=None):
-    pass  
+def comments(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
 
+    
+    if request.method == "POST":
+        content = request.POST["content"]
+
+      
+        Comment.objects.create(
+                user=request.user,
+                post=post,
+                content=content
+            )
+         # Get redirect target (from query parameter)
+        redirect_to = request.GET.get('redirect_to', 'index')  # Default to 'index' if not provided
+
+        # If liking from profile page, include user ID in redirect
+        if redirect_to == "profile_display":
+              return redirect(reverse(redirect_to, args=[post.user.id]) + f'?post_id={post.id}')
+    
+        return redirect(reverse(redirect_to) + f'?post_id={post.id}')
