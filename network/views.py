@@ -269,5 +269,8 @@ class FollowViewSet(viewsets.ModelViewSet):
              return Response({"message": "Unfollowed successfully"}, status=status.HTTP_204_NO_CONTENT)
           except Follow.DoesNotExist:
               return Response({"error": "Follow relationship not found"}, status=status.HTTP_404_NOT_FOUND)
-    
+
+@login_required  # Ensures only logged-in users can access this view
+def create_or_edit_post(request, post_id=None):
+    pass  
 

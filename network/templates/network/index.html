@@ -81,46 +81,68 @@
         </a>
         <span class="comment"><a href="#">Comments</a></span>
       </div>
+      <!-- Comment Form (Visible only for logged-in users) -->
+      {% if user.is_authenticated %}
+      <div class="comment-section">
+        <form method="POST" action="#" class="comment-form">
+          {% csrf_token %}
+          <textarea
+            name="content"
+            rows="2"
+            placeholder="Add a comment..."
+            required
+            class="comment-textarea"
+          ></textarea>
+              <div class="submit-wrapper">
+          <button type="submit" class="comment-button">Comment</button>
+              </div>
+        </form>
+      </div>
+        {% endif %}
+        <div class="comments"></div>
+      </div>
     </div>
-    {% endfor %} {% else %}
-    <p>No Posts available</p>
-    {% endif %}
-    <!-- Pagination Controls -->
-    <div class="pagination-container">
-      <nav aria-label="Page navigation">
-        <ul class="pagination">
-          {% if posts.has_previous %}
-          <li class="page-item">
-            <a class="page-link" href="?page=1">First</a>
-          </li>
-          <li class="page-item">
-            <a class="page-link" href="?page={{ posts.previous_page_number }}"
-              >Previous</a
-            >
-          </li>
-          {% endif %}
 
-          <li class="page-item disabled">
-            <span class="page-link"
-              >Page {{ posts.number }} of {{ posts.paginator.num_pages }}</span
-            >
-          </li>
+      {% endfor %} {% else %}
+      <p>No Posts available</p>
+      {% endif %}
+      <!-- Pagination Controls -->
+      <div class="pagination-container">
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            {% if posts.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1">First</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ posts.previous_page_number }}"
+                >Previous</a
+              >
+            </li>
+            {% endif %}
 
-          {% if posts.has_next %}
-          <li class="page-item">
-            <a class="page-link" href="?page={{ posts.next_page_number }}"
-              >Next</a
-            >
-          </li>
-          <li class="page-item">
-            <a class="page-link" href="?page={{ posts.paginator.num_pages }}"
-              >Last</a
-            >
-          </li>
-          {% endif %}
-        </ul>
-      </nav>
+            <li class="page-item disabled">
+              <span class="page-link"
+                >Page {{ posts.number }} of {{ posts.paginator.num_pages }}</span
+              >
+            </li>
+
+            {% if posts.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ posts.next_page_number }}"
+                >Next</a
+              >
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ posts.paginator.num_pages }}"
+                >Last</a
+              >
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
     </div>
   </div>
+  {% endblock %}
 </div>
-{% endblock %}
