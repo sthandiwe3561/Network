@@ -278,6 +278,55 @@
   text-decoration: underline;
 }
 
+/*comment dropdown menu*/
+.comment-options {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between Follow button and ⋮ dropdown */
+  margin-left: 30px;
+}
+
+.comment-options-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.comment-dropdown-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 5px;
+}
+
+.comment-dropdown-menu li {
+  padding: 3px;
+}
+
+.comment-dropdown-menu li a {
+  text-decoration: none;
+  color: black;
+  display: block;
+}
+
+.comment-dropdown-menu li:hover {
+  background: #f5f5f5;
+}
+
+.comment-dropdown-menu {
+  margin-top: 5%;
+  margin-left: 3%;
+  display: none;
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  min-width: 100px;
+  width: 39%;
+  border-radius: 5px;
+  z-index: 10;
+}
+
 /*post form*/
 /* Form Container */
 .form-container {

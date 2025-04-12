@@ -271,19 +271,31 @@ class FollowViewSet(viewsets.ModelViewSet):
               return Response({"error": "Follow relationship not found"}, status=status.HTTP_404_NOT_FOUND)
 
 @login_required  # Ensures only logged-in users can access this view
-def comments(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
+def create_or_edit_comment(request, post_id=None, comment_id=None):
+    if post_id:
+       post = get_object_or_404(Post, id=post_id)
+    elif comment_id:
+         comment = get_object_or_404(Comment, id=comment_id)
+         post = comment.post
+    else:
+        return redirect("index")  # or show 404
 
     
     if request.method == "POST":
         content = request.POST["content"]
 
-      
-        Comment.objects.create(
-                user=request.user,
-                post=post,
-                content=content
-            )
+        if comment_id:
+              # Editing existing comment
+            if comment.user != request.user:
+                return redirect("index")  # Only owner can edit
+            comment.content = content
+            comment.save()
+        else:
+            Comment.objects.create(
+                 user=request.user,
+                 post=post,
+                 content=content
+                 )
          # Get redirect target (from query parameter)
         redirect_to = request.GET.get('redirect_to', 'index')  # Default to 'index' if not provided
 

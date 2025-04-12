@@ -94,6 +94,18 @@
         />
         <strong class="comment-username">{{ comment.user.username|capfirst }}</strong>
         <span>{{comment.created_at}}</span>
+         <!-- Actions (Only for owner) -->
+      {% if comment.user == user %}
+          <div class="post-options">
+          <button class="options-btn">⋮</button>
+          <div class="dropdown-menu">
+            <ul>
+              <li><a href="{% url 'edit_post' post.id %}">Edit</a></li>
+              <li><a href="{% url 'delete' post.id %}">Delete</a></li>           
+            </ul>
+          </div>
+        </div>
+      {% endif %}
       </div>
 
       <!-- Content -->

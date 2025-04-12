@@ -114,4 +114,30 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch((error) => console.error("Error unfollowing user:", error));
     }
   }
+
+  //comment dropdown menu
+  //fetch the comment dropdown button and add event listener
+  const comment_dropdown = document.querySelectorAll(".comment-options-btn");
+  const comment_dropMenu = document.querySelectorAll(".comment-dropdown-menu");
+
+  function CommentdropDown(event) {
+    // Get the corresponding comment dropdown menu for the clicked button
+    const clickedMenu = event.target.nextElementSibling;
+    const isAlreadyVisible = clickedMenu.style.display === "block";
+
+    // Hide all comment dropdown menus
+    comment_dropMenu.forEach((menu) => {
+      menu.style.display = "none";
+    });
+
+    // Show the clicked one only if it was not already visible
+    if (!isAlreadyVisible) {
+      clickedMenu.style.display = "block";
+    }
+  }
+
+  //select all comment dropdown buttons
+  comment_dropdown.forEach((dropdowns) => {
+    dropdowns.addEventListener("click", CommentdropDown);
+  });
 });

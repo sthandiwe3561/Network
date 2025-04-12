@@ -82,9 +82,10 @@
         <span class="comment"><a href="#">Comments</a></span>
       </div>
       <!-- Comment Form (Visible only for logged-in users) -->
+         {% for comment in post.comment_post.all %}
       {% if user.is_authenticated %}
       <div class="comment-section">
-        <form method="POST" action="{% url 'comment' post.id %}?redirect_to={{ request.resolver_match.url_name }}" class="comment-form">
+        <form method="POST" action="{% if post %}{% url 'edit_post' post.id %}{% else %}{% url 'create_post' %}{% endif %}?redirect_to={{ request.resolver_match.url_name }}" class="comment-form">
           {% csrf_token %}
           <textarea
             name="content"
@@ -98,6 +99,7 @@
               </div>
         </form>
       </div>
+      {% endfor %}
         {% endif %}
  <div class="comments">
   {% for comment in post.comment_post.all %}
@@ -111,18 +113,22 @@
         />
         <strong class="comment-username">{{ comment.user.username|capfirst }}</strong>
         <span>{{comment.created_at}}</span>
+          <!-- Actions (Only for owner) -->
+      {% if comment.user == user %}
+          <div class="comment-options">
+          <button class="comment-options-btn">⋮</button>
+          <div class="comment-dropdown-menu">
+            <ul>
+              <li><a href="#">Edit</a></li>
+              <li><a href="#">Delete</a></li>           
+            </ul>
+          </div>
+        </div>
+      {% endif %}
       </div>
 
       <!-- Content -->
       <p class="comment-content">{{ comment.content }}</p>
-
-      <!-- Actions (Only for owner) -->
-      {% if comment.user == user %}
-        <div class="comment-actions">
-          <a href="#" class="comment-edit-btn">Edit</a>
-          <a href="#" class="comment-delete-btn">Delete</a>
-        </div>
-      {% endif %}
     </div>
   {% empty %}
     <p class="no-comment">No comments yet.</p>
